@@ -224,8 +224,6 @@ class AtomMinifyView extends View
 
         options = @obtainMinifierOptions(fileType, @options.jsMinifier)
 
-        console.log inputFilename
-
         params =
             type: if fileType == 'css' then @options.cssMinifier else @options.jsMinifier,
             fileIn: inputFilename,
@@ -291,7 +289,6 @@ class AtomMinifyView extends View
         timestamp = new Date().getTime()
         filename = "atom-minify.#{timestamp}.#{filenameAddition}.tmp"
         filename = path.join(os.tmpdir(), filename)
-        console.log filename
         return filename
 
 
