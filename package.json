@@ -1,0 +1,19 @@
+{
+  "name": "atom-minify",
+  "main": "./lib/atom-minify",
+  "version": "0.0.0",
+  "description": "Minifies JS and CSS files, optionally on save.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/armin-pfaeffle/atom-minify"
+  },
+  "license": "MIT",
+  "engines": {
+    "atom": ">=0.174.0 <2.0.0"
+  },
+  "dependencies": {
+    "atom-space-pen-views": "^2.0.3",
+    "node-minify": "^1.1.0",
+    "mkdirp": "latest"
+  }
+ }

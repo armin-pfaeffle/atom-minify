@@ -1,0 +1,68 @@
+# Keybindings require three things to be fully defined: A selector that is
+# matched against the focused element, the keystroke and the command to
+# execute.
+#
+# Below is a basic keybinding which registers on all platforms by applying to
+# the root workspace element.
+
+# For more detailed documentation see
+# https://atom.io/docs/latest/advanced/keymaps
+
+# Mac OS
+'.platform-darwin atom-workspace atom-text-editor:not(.mini)':
+    # Default
+    'ctrl-shift-m': 'atom-minify:minify-to-min-file'
+    'cmd-shift-m': 'atom-minify:minify-direct'
+    'ctrl-cmd-shift-m': 'atom-minify:toggle-minify-on-save'
+    'ctrl-cmd-shift-h': 'atom-minify:close-panel'
+
+    # Select CSS minifier
+    'ctrl-cmd-shift-c ctrl-1': 'atom-minify:css-minifier-yui'
+    'ctrl-cmd-shift-c ctrl-2': 'atom-minify:css-minifier-clean-css'
+    'ctrl-cmd-shift-c ctrl-3': 'atom-minify:css-minifier-csso'
+    'ctrl-cmd-shift-c ctrl-4': 'atom-minify:css-minifier-sqwish'
+
+    # Select JS minifier
+    'ctrl-cmd-shift-j ctrl-1': 'atom-minify:js-minifier-yui'
+    'ctrl-cmd-shift-j ctrl-2': 'atom-minify:js-minifier-gcc'
+    'ctrl-cmd-shift-j ctrl-3': 'atom-minify:js-minifier-uglifyjs2'
+
+
+# Linux
+'.platform-linux atom-workspace atom-text-editor:not(.mini)':
+    # Default
+    'ctrl-shift-m': 'atom-minify:minify-to-min-file'
+    'alt-shift-m': 'atom-minify:minify-direct'
+    'ctrl-alt-shift-m': 'atom-minify:toggle-minify-on-save'
+    'ctrl-alt-shift-h': 'atom-minify:close-panel'
+
+    # Select CSS minifier
+    'ctrl-alt-shift-c ctrl-1': 'atom-minify:css-minifier-yui'
+    'ctrl-alt-shift-c ctrl-2': 'atom-minify:css-minifier-clean-css'
+    'ctrl-alt-shift-c ctrl-3': 'atom-minify:css-minifier-csso'
+    'ctrl-alt-shift-c ctrl-4': 'atom-minify:css-minifier-sqwish'
+
+    # Select JS minifier
+    'ctrl-alt-shift-j ctrl-1': 'atom-minify:js-minifier-yui'
+    'ctrl-alt-shift-j ctrl-2': 'atom-minify:js-minifier-gcc'
+    'ctrl-alt-shift-j ctrl-3': 'atom-minify:js-minifier-uglifyjs2'
+
+
+# Windows
+'.platform-win32 atom-workspace atom-text-editor:not(.mini)':
+    # Default
+    'ctrl-shift-m': 'atom-minify:minify-to-min-file'
+    'alt-shift-m': 'atom-minify:minify-direct'
+    'ctrl-alt-shift-m': 'atom-minify:toggle-minify-on-save'
+    'ctrl-alt-shift-h': 'atom-minify:close-panel'
+
+    # Select CSS minifier
+    'ctrl-alt-shift-c ctrl-1': 'atom-minify:css-minifier-yui'
+    'ctrl-alt-shift-c ctrl-2': 'atom-minify:css-minifier-clean-css'
+    'ctrl-alt-shift-c ctrl-3': 'atom-minify:css-minifier-csso'
+    'ctrl-alt-shift-c ctrl-4': 'atom-minify:css-minifier-sqwish'
+
+    # Select JS minifier
+    'ctrl-alt-shift-j ctrl-1': 'atom-minify:js-minifier-yui'
+    'ctrl-alt-shift-j ctrl-2': 'atom-minify:js-minifier-gcc'
+    'ctrl-alt-shift-j ctrl-3': 'atom-minify:js-minifier-uglifyjs2'

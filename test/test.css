@@ -1,0 +1,22 @@
+body {
+    font-size: 10pt;
+    }
+
+#main {
+    font-size: 2.0em;
+    background-color: #ff0000;
+    color: #123456;
+    padding: 10px
+    }
+
+.content {
+    color: #f00
+    }
+
+.content > .child {
+    padding: 10px
+    }
+
+button {
+    color: white
+    }
