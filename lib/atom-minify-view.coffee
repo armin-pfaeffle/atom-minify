@@ -293,6 +293,7 @@ class AtomMinifyView extends View
 
 
     obtainMinifiedFilename: (filename, pattern) ->
+        path = require('path')
         basename = path.basename(filename)
         basename = basename.replace(/^(.*?)\.(css|js)$/ig, pattern)
         minifiedFilename = path.join(path.dirname(filename), basename)
