@@ -1,3 +1,6 @@
+**0.1.4 - 27.05.2015**
+- Updated required engine version to <=0.185.0, <2.0.0
+
 **0.1.3 - 27.05.2015**
 - Bugfix: Using deprecrated API, so package does not work with API 1.0
 
