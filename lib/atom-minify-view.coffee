@@ -203,7 +203,7 @@ class AtomMinifyView extends View
         minifier = require('node-minify')
         fs = require('fs')
 
-        atom.workspace.getActiveEditor().getText()
+        atom.workspace.getActiveTextEditor().getText()
 
         if method is AtomMinifyView.MINIFY_DIRECT
             # We store the current input to a temporary file, so this file is minified.
@@ -211,7 +211,7 @@ class AtomMinifyView extends View
             # to minify it, we have to store the content to a file first, which then
             # gets minified.
             inputFilename = @obtainTemporaryFilename('input')
-            fs.writeFileSync(inputFilename, atom.workspace.getActiveEditor().getText())
+            fs.writeFileSync(inputFilename, atom.workspace.getActiveTextEditor().getText())
         else
             inputFilename = filename
 
@@ -241,11 +241,11 @@ class AtomMinifyView extends View
                         # Calc saving BEFORE we edit the text editors text
                         statistics =
                             directMinification: true
-                            before: atom.workspace.getActiveEditor().getText().length
+                            before: atom.workspace.getActiveTextEditor().getText().length
                             after: minifiedText.length
 
                         # Apply text but do NOT save it
-                        atom.workspace.getActiveEditor().setText(minifiedText)
+                        atom.workspace.getActiveTextEditor().setText(minifiedText)
                     else
                         statistics =
                             directMinification: false
@@ -268,7 +268,7 @@ class AtomMinifyView extends View
 
 
     checkFileIsSaved: ->
-        editor = atom.workspace.getActiveEditor()
+        editor = atom.workspace.getActiveTextEditor()
         if editor.isModified()
             atom.confirm
                 message: "'#{editor.getTitle()}' has changes, do you want to save them?"
