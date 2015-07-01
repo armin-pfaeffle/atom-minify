@@ -222,7 +222,7 @@ class AtomMinifyView extends View
         outputFilename = if method is AtomMinifyView.MINIFY_DIRECT then @obtainTemporaryFilename('output') else @obtainMinifiedFilename(filename, pattern)
 
 
-        options = @obtainMinifierOptions(fileType, @options.jsMinifier)
+        options = @obtainMinifierOptions(fileType)
 
         params =
             type: if fileType == 'css' then @options.cssMinifier else @options.jsMinifier,
@@ -300,16 +300,16 @@ class AtomMinifyView extends View
         return minifiedFilename
 
 
-    obtainMinifierOptions: (fileType, minifier) ->
+    obtainMinifierOptions: (fileType) ->
         options = null
         if fileType is 'css'
-            switch minifier
+            switch @options.cssMinifier
                 when 'yui-css' then options = @options.cssParametersForYUI
                 when 'clean-css' then options = @options.cssParametersForCleanCSS
                 when 'csso' then options = @options.cssParametersForCSSO
                 when 'sqwish' then options = @options.cssParametersForSqwish
         else if fileType is 'js'
-            switch minifier
+            switch @options.jsMinifier
                 when 'yui-js' then options = @options.jsParametersForYUI
                 when 'gcc' then options = @options.jsParametersForGCC
                 when 'uglifyjs' then options = @options.jsParametersForUglifyJS2
