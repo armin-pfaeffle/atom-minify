@@ -170,6 +170,10 @@ For other concerns like questions or feeback [have a look at the discussion thre
 
 ## Changelog
 
+**0.1.7 - 01.07.2015**
+- Bugfix: CSS parameters ignored ([pull request](https://github.com/armin-pfaeffle/atom-minify/pull/3) by [William Wells](https://github.com/whanwells))
+- Removed unused code
+
 **0.1.5 / 0.1.6 - 27.05.2015**
 - Updated CHANGELOG and README
 

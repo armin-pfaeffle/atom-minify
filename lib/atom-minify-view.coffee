@@ -203,8 +203,6 @@ class AtomMinifyView extends View
         minifier = require('node-minify')
         fs = require('fs')
 
-        atom.workspace.getActiveTextEditor().getText()
-
         if method is AtomMinifyView.MINIFY_DIRECT
             # We store the current input to a temporary file, so this file is minified.
             # The reason for this is that if a user has modified the content and wants
