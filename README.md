@@ -4,14 +4,16 @@ Minifies JS and CSS files, optionally on save.
 
 ---
 
-Because [minifier](https://atom.io/packages/minifier) is no longer maintained, I created [atom-minify](https://atom.io/packages/atom-minify) which is based on [node-minify](https://www.npmjs.com/package/node-minify). Therefore you can select between **four CSS and three JS compressors**. Another feature is the extensive configuration which should give you full control over minification and created files.
+Because [minifier](https://atom.io/packages/minifier) is no longer maintained, I created [atom-minify](https://atom.io/packages/atom-minify) which is includes **four CSS and three JS compressors**. Another feature is the extensive configuration which should give you full control over minification and created files.
+
+*Current version does not depend on node-minify any more and can contain errors because the package is completely rewritten. Please let me know if there is any behaviour that does not come up to one's expectations. Further, minifier parameters are ignored at the moment. This feature will be included in next version.*
 
 Have a look at the [roadmap](#roadmap) for upcoming features.
 
 
 ## Requirements
 
-When you want to use **YUI Compressor** or **Google Closure Compiler*,*java you must be install [Java](https://www.java.com/de/download/).
+When you want to use **YUI Compressor** or **Google Closure Compiler**, you must install [Java](https://www.java.com/de/download/). If Java is not present, you will see an error message.
 
 
 ## Usage
@@ -166,9 +168,18 @@ For other concerns like questions or feeback [have a look at the discussion thre
 - Introduce parameters as comments in CSS and JS files that overrides general package options (like in sass-autocompile)
 - Minify HTML/JSON/XML/etc. ?
 - Compress more than one file to a minified file
+- Auto-hide checkbox on panel, beside close button
+- Include minify entry in tree view popup
+- New option: Overwrite existant file
+- New ption: disallow minification of file with .min. substring
 
 
 ## Changelog
+
+**0.2.0 - 12.07.2015**
+- Complete rewrite of package, not depending on node-minify any more
+- Improved output filename generation
+- Minor improvements
 
 **0.1.7 - 01.07.2015**
 - Bugfix: CSS parameters ignored ([pull request](https://github.com/armin-pfaeffle/atom-minify/pull/3) by [William Wells](https://github.com/whanwells))

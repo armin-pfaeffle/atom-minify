@@ -1,4 +1,6 @@
-AtomMinifyView = require './atom-minify-view'
+AtomMinifyOptions = require('./options')
+AtomMinifyView = require('./atom-minify-view')
+AtomMinifier = require('./minifier')
 
 module.exports =
 
@@ -98,7 +100,7 @@ module.exports =
             title: 'Buffer'
             description: 'Only modify the buffer size when you have to compile large files.'
             type: 'integer'
-            default: 1000 * 1024
+            default: 1024 * 1024
             order: 12
 
 
@@ -161,17 +163,17 @@ module.exports =
 
 
     activate: (state) ->
-        @atomMinifyView = new AtomMinifyView(state.atomMinifyViewState)
+        @atomMinifyView = new AtomMinifyView(new AtomMinifyOptions(), state.atomMinifyViewState)
 
         atom.commands.add 'atom-workspace',
             'atom-minify:toggle-minify-on-save': =>
                 @toggleMinifyOnSave()
 
             'atom-minify:minify-to-min-file': =>
-                @minify(AtomMinifyView.MINIFY_TO_MIN_FILE)
+                @minify(AtomMinifier.MINIFY_TO_MIN_FILE)
 
             'atom-minify:minify-direct': =>
-                @minify(AtomMinifyView.MINIFY_DIRECT)
+                @minify(AtomMinifier.MINIFY_DIRECT)
 
             'atom-minify:close-panel': (e) =>
                 @closePanel()
@@ -198,6 +200,7 @@ module.exports =
             'atom-minify:js-minifier-uglifyjs2': =>
                 @selectJsMinifier('UglifyJS2')
 
+        @registerTextEditorSaveCallback()
         @addMenuItems()
 
 
@@ -210,30 +213,54 @@ module.exports =
 
 
     toggleMinifyOnSave: ->
-        AtomMinifyView.setOption('minifyOnSave', !AtomMinifyView.getOption('minifyOnSave'))
-        if AtomMinifyView.getOption('minifyOnSave')
+        AtomMinifyOptions.set('minifyOnSave', !AtomMinifyOptions.get('minifyOnSave'))
+        if AtomMinifyOptions.get('minifyOnSave')
             atom.notifications.addInfo('Minify: Enabled minification on save')
         else
             atom.notifications.addWarning('Minify: Disabled minification on save')
         @updateMenuItems()
 
 
-    minify: (method) ->
-        @atomMinifyView.minify(method, true)
-
-
     selectCssMinifier: (minifier) ->
         validCssMinifiers = ['YUI Compressor', 'clean-css', 'CSSO', 'Sqwish']
         if minifier in validCssMinifiers
-            AtomMinifyView.setOption('cssMinifier', minifier)
+            AtomMinifyOptions.set('cssMinifier', minifier)
             atom.notifications.addInfo("Minify: #{minifier} is new CSS minifier")
 
 
     selectJsMinifier: (minifier) ->
         validJsMinifiers = ['YUI Compressor', 'Google Closure Compiler', 'UglifyJS2']
         if minifier in validJsMinifiers
-            AtomMinifyView.setOption('jsMinifier', minifier)
+            AtomMinifyOptions.set('jsMinifier', minifier)
             atom.notifications.addInfo("Minify: #{minifier} is new JS minifier")
+
+
+    registerTextEditorSaveCallback: ->
+        @isProcessing = false
+        atom.workspace.observeTextEditors (editor) =>
+            editor.onDidSave =>
+                if AtomMinifyOptions.get('minifyOnSave') and !@isProcessing
+                    @minify(AtomMinifier.MINIFY_TO_MIN_FILE, true)
+
+
+    minify: (mode, minifyOnSave = false) ->
+        options = new AtomMinifyOptions()
+
+        @atomMinifyView.updateOptions(options)
+
+        minifier = new AtomMinifier(options)
+        minifier.onStart( (args) =>
+            @atomMinifyView.startMinification(args)
+        )
+        minifier.onSuccess( (args) =>
+            @atomMinifyView.successfullMinification(args)
+            @isProcessing = false
+        )
+        minifier.onError( (args) =>
+            @atomMinifyView.erroneousMinification(args)
+            isProcessing = false
+        )
+        minifier.minify(mode, minifyOnSave)
 
 
     addMenuItems: ->
@@ -277,7 +304,7 @@ module.exports =
                 for submenu in menu.submenu
                     if submenu.label == 'Minify'
                         item = submenu.submenu[2]
-                        item.label = (if AtomMinifyView.getOption('minifyOnSave') then 'Disable' else 'Enable') + ' minification on save'
+                        item.label = (if AtomMinifyOptions.get('minifyOnSave') then 'Disable' else 'Enable') + ' minification on save'
 
         atom.menu.update()
 

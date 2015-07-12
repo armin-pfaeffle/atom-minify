@@ -1,3 +1,8 @@
+**0.2.0 - 12.07.2015**
+- Complete rewrite of package, not depending on node-minify any more
+- Improved output filename generation
+- Minor improvements
+
 **0.1.7 - 01.07.2015**
 - Bugfix: CSS parameters ignored ([pull request](https://github.com/armin-pfaeffle/atom-minify/pull/3) by [William Wells](https://github.com/whanwells))
 - Removed unused code
