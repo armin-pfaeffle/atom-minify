@@ -8,7 +8,7 @@ class AtomMinifyView extends View
 
 
     @content: ->
-        @div class: 'atom-minify atom-panel panel-bottom hide', =>
+        @div class: 'atom-minify atom-panel panel-bottom', =>
             @div class: 'inset-panel', =>
                 @div outlet: 'panelHeading', class: 'panel-heading no-border', =>
                     @span
@@ -30,6 +30,9 @@ class AtomMinifyView extends View
     constructor: (options, args...) ->
         super(args)
         @options = options
+        @panel = atom.workspace.addBottomPanel
+            item: this
+            visible: false
 
 
     initialize: (serializeState) ->
@@ -37,6 +40,7 @@ class AtomMinifyView extends View
 
     destroy: ->
         clearTimeout(@automaticHidePanelTimeout)
+        @panel.destroy()
         @detach()
 
 
@@ -170,11 +174,8 @@ class AtomMinifyView extends View
 
         if reset
             @resetPanel()
-
-        atom.workspace.addBottomPanel
-            item: this
-
-        @removeClass('hide')
+	    
+        @panel.show()
 
 
     hidePanel: (withDelay = false)->
@@ -185,11 +186,11 @@ class AtomMinifyView extends View
         if withDelay == true
             @automaticHidePanelTimeout = setTimeout =>
                 @hideThrobber()
-                @addClass('hide')
+                @panel.hide()
             , @options.autoHidePanelDelay
         else
             @hideThrobber()
-            @addClass('hide')
+            @panel.hide()
 
 
     setCaption: (text) ->

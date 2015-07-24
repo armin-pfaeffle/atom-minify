@@ -1,3 +1,6 @@
+**0.2.1 - 24.07.2015**
+- Improved and fixed panel notification
+
 **0.2.0 - 12.07.2015**
 - Complete rewrite of package, not depending on node-minify any more
 - Improved output filename generation
