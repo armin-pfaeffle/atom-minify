@@ -1,3 +1,6 @@
+**0.2.2 - 27.07.2015**
+- Fixed link in documentation
+
 **0.2.1 - 24.07.2015**
 - Improved and fixed panel notification
 

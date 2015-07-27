@@ -158,8 +158,8 @@ Select the CSS minifier **UglifyJS2**.
 
 [Please post issues on GitHub](https://github.com/armin-pfaeffle/atom-minify/issues).
 
-For other concerns like questions or feeback [have a look at the discussion thread on atom.io](https://coming-soon.com
-/).
+For other concerns like questions or feeback [have a look at the discussion thread on atom.io](https://discuss.atom.io/t/feedback-questions-about-atom-minify/).
+
 
 ## Roadmap
 
@@ -175,6 +175,9 @@ For other concerns like questions or feeback [have a look at the discussion thre
 
 
 ## Changelog
+
+**0.2.2 - 27.07.2015**
+- Fixed link in documentation
 
 **0.2.1 - 24.07.2015**
 - Improved and fixed panel notification
