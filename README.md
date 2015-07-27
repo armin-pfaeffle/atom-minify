@@ -4,7 +4,7 @@ Minifies JS and CSS files, optionally on save.
 
 ---
 
-Because [minifier](https://atom.io/packages/minifier) is no longer maintained, I created [atom-minify](https://atom.io/packages/atom-minify) which is includes **four CSS and three JS compressors**. Another feature is the extensive configuration which should give you full control over minification and created files.
+Because [minifier](https://atom.io/packages/minifier) is no longer maintained, I created [atom-minify](https://atom.io/packages/atom-minify) which includes **four CSS and three JS compressors**. Another feature is the extensive configuration which should give you full control over minification and created files.
 
 *Current version does not depend on node-minify any more and can contain errors because the package is completely rewritten. Please let me know if there is any behaviour that does not come up to one's expectations. Further, minifier parameters are ignored at the moment. This feature will be included in next version.*
 
