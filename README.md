@@ -4,7 +4,7 @@ Minifies JS and CSS files, optionally on save; now supporting inline-parameters.
 
 ---
 
-Because [minifier](https://atom.io/packages/minifier) is no longer maintained, I created [atom-minify](https://atom.io/packages/atom-minify) which is includes **four CSS and three JS minifiers**. Another feature is the flexible configuration which should give you full control over minification and created files. Inline-parameters complete the way of defining the output.
+Because [minifier](https://atom.io/packages/minifier) is no longer maintained, I created [atom-minify](https://atom.io/packages/atom-minify) which includes **four CSS and three JS minifiers**. Another feature is the flexible configuration which should give you full control over minification and created files. Inline-parameters complete the way of defining the output.
 
 *In current version minifier options are ignored at the moment. This feature will be included in next version.*
 
