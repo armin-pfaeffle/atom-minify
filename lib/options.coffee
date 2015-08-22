@@ -21,14 +21,31 @@ class AtomMinifyOptions
 
 
     initialize: () ->
+        # General options
         @showSavingInfo = AtomMinifyOptions.get('showSavingInfo')
+        @checkOutputFileAlreadyExists = AtomMinifyOptions.get('checkOutputFileAlreadyExists')
+        @checkAlreadyMinifiedFile = AtomMinifyOptions.get('checkAlreadyMinifiedFile')
 
+        # Extended options
+        @outputPath = AtomMinifyOptions.get('outputPath')
+        @buffer = AtomMinifyOptions.get('buffer')
+
+        # CSS options
         @cssMinifier = @parseCssMinifier(AtomMinifyOptions.get('cssMinifier'))
-        @jsMinifier = @parseJsMinifier(AtomMinifyOptions.get('jsMinifier'))
-
         @cssMinifiedFilenamePattern = AtomMinifyOptions.get('cssMinifiedFilenamePattern')
-        @jsMinifiedFilenamePattern = AtomMinifyOptions.get('jsMinifiedFilenamePattern')
+        @cssParametersForYUI = AtomMinifyOptions.get('cssParametersForYUI')
+        @cssParametersForCleanCSS = AtomMinifyOptions.get('cssParametersForCleanCSS')
+        @cssParametersForCSSO = AtomMinifyOptions.get('cssParametersForCSSO')
+        @cssParametersForSqwish = AtomMinifyOptions.get('cssParametersForSqwish')
 
+        # JS options
+        @jsMinifier = @parseJsMinifier(AtomMinifyOptions.get('jsMinifier'))
+        @jsMinifiedFilenamePattern = AtomMinifyOptions.get('jsMinifiedFilenamePattern')
+        @jsParametersForYUI = AtomMinifyOptions.get('jsParametersForYUI')
+        @jsParametersForGCC = AtomMinifyOptions.get('jsParametersForGCC')
+        @jsParametersForUglifyJS2 = AtomMinifyOptions.get('jsParametersForUglifyJS2')
+
+        # Notification options
         @showInfoNotification = AtomMinifyOptions.get('notifications') in ['Notifications', 'Panel, Notifications']
         @showSuccessNotification = AtomMinifyOptions.get('notifications') in ['Notifications', 'Panel, Notifications']
         @showErrorNotification = AtomMinifyOptions.get('notifications') in ['Notifications', 'Panel, Notifications']
@@ -44,18 +61,6 @@ class AtomMinifyOptions
         @autoHidePanelDelay = AtomMinifyOptions.get('autoHidePanelDelay')
 
         @showStartMinificationNotification = AtomMinifyOptions.get('showStartMinificationNotification')
-
-        # Extended options
-        @buffer = AtomMinifyOptions.get('buffer')
-
-        @cssParametersForYUI = AtomMinifyOptions.get('cssParametersForYUI')
-        @cssParametersForCleanCSS = AtomMinifyOptions.get('cssParametersForCleanCSS')
-        @cssParametersForCSSO = AtomMinifyOptions.get('cssParametersForCSSO')
-        @cssParametersForSqwish = AtomMinifyOptions.get('cssParametersForSqwish')
-
-        @jsParametersForYUI = AtomMinifyOptions.get('jsParametersForYUI')
-        @jsParametersForGCC = AtomMinifyOptions.get('jsParametersForGCC')
-        @jsParametersForUglifyJS2 = AtomMinifyOptions.get('jsParametersForUglifyJS2')
 
 
     parseCssMinifier: (minifier) ->

@@ -1,0 +1,35 @@
+'menu': [ {
+    'label': 'Packages'
+    'submenu': [
+        'label': 'Minify'
+        'submenu': [
+            { 'label': 'Minify to minified file', 'command': 'atom-minify:minify-to-min-file' }
+            { 'label': 'Direct Minification', 'command': 'atom-minify:minify-direct' }
+            { 'label': 'Enable minification on save', 'command': 'atom-minify:toggle-minify-on-save' }
+
+            { 'type': 'separator' }
+
+            { 'label' : 'CSS minifier', 'submenu': [
+                { 'label': 'YUI Compressor', 'command': 'atom-minify:css-minifier-yui', 'type': 'radio' }
+                { 'label': 'clean-css', 'command': 'atom-minify:css-minifier-clean-css', 'type': 'radio' }
+                { 'label': 'CSSO', 'command': 'atom-minify:css-minifier-csso', 'type': 'radio' }
+                { 'label': 'Sqwish', 'command': 'atom-minify:css-minifier-sqwish', 'type': 'radio' }
+            ] }
+            { 'label' : 'JS minifier', 'submenu': [
+                { 'label': 'YUI Compressor', 'command': 'atom-minify:js-minifier-yui', 'type': 'radio' }
+                { 'label': 'Google Closure Compiler', 'command': 'atom-minify:js-minifier-gcc', 'type': 'radio' }
+                { 'label': 'UglifyJS2', 'command': 'atom-minify:js-minifier-uglifyjs2', 'type': 'radio' }
+            ] }
+        ]
+    ]
+} ]
+
+
+'context-menu':
+    '.tree-view': [
+        { 'label': 'Search in Directory', 'command': 'project-find:show-in-current-directory' }
+        {'type': 'separator'}
+
+        {'label': 'Minifiy', 'command': 'atom-minify:minify-to-min-file', 'id': 'atom-minify-context-menu-minify' }
+        {'type': 'separator'}
+    ]

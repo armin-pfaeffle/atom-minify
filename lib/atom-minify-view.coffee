@@ -1,4 +1,4 @@
-{$$, View} = require('atom-space-pen-views')
+{$, $$, View} = require('atom-space-pen-views')
 
 module.exports =
 class AtomMinifyView extends View
@@ -17,14 +17,15 @@ class AtomMinifyView extends View
                     @span
                         outlet: 'panelLoading'
                         class: 'inline-block loading loading-spinner-tiny hide'
-                        style: 'margin-left: 10px;'
-                    @div class: 'inline-block pull-right', =>
+                    @div outlet: 'panelRightTopOptions', class: 'inline-block pull-right right-top-options', =>
                         @button
                             outlet: 'panelClose'
-                            class: 'btn btn-close hide'
+                            class: 'btn btn-close'
                             click: 'hidePanel'
                             'Close'
-                @div outlet: 'panelBody', class: 'panel-body padded hide', =>
+                @div
+                    outlet: 'panelBody'
+                    class: 'panel-body padded hide'
 
 
     constructor: (options, args...) ->
@@ -59,7 +60,7 @@ class AtomMinifyView extends View
             @showPanel(true)
             if @options.showStartMinificationNotification
                 if args.isMinifyToFile
-                    @addText(args.inputFilename, 'terminal', 'info', () => @openFile(args.inputFilename) )
+                    @addText(args.inputFilename, 'terminal', 'info', (evt) => @openFile(args.inputFilename, evt.target) )
                 else
                     @addText('Start direct minification', 'terminal', 'info',)
 
@@ -80,10 +81,10 @@ class AtomMinifyView extends View
             @showPanel()
             @setCaption('Successfully minified')
             @hideThrobber()
-            @showCloseButton()
+            @showRightTopOptions()
 
             if args.isMinifyToFile
-                @addText(args.outputFilename, 'check', 'success', () => @openFile(args.outputFilename) )
+                @addText args.outputFilename, 'check', 'success', (evt) => @openFile(args.outputFilename, evt.target)
             else
                 @addText('Successfully minified!', 'check', 'success')
             if @options.showSavingInfo
@@ -95,13 +96,14 @@ class AtomMinifyView extends View
 
 
     erroneousMinification: (args) ->
-        @showErrorNotification('Minification error', args.error)
+        caption = 'Minification error' + if args.minifierName then ' — ' + args.minifierName else ''
+        @showErrorNotification(caption, args.error)
 
         if @options.showPanel
             @showPanel()
-            @setCaption('Minification error')
+            @setCaption(caption)
             @hideThrobber()
-            @showCloseButton()
+            @showRightTopOptions()
 
             @addText(args.error, 'alert', 'error')
 
@@ -130,8 +132,23 @@ class AtomMinifyView extends View
         return saving
 
 
-    openFile: (filename) ->
-        atom.workspace.open filename
+    openFile: (filename, targetElement) ->
+        fs = require('fs')
+        fs.exists filename, (exists) =>
+            if exists
+                atom.workspace.open filename
+            else
+                target = $(targetElement)
+                if not target.is('p.clickable')
+                    target = target.parent()
+
+                target
+                    .addClass('target-file-does-not-exist')
+                    .removeClass('clickable')
+                    .append($('<span>File does not exist!</span>').addClass('hint'))
+                    .off('click')
+                    .children(':first')
+                        .removeClass('text-success text-warning text-info')
 
 
     showInfoNotification: (title, message) ->
@@ -165,7 +182,7 @@ class AtomMinifyView extends View
     resetPanel: ->
         @setCaption('Processing...')
         @showThrobber()
-        @hideCloseButton()
+        @hideRightTopOptions()
         @panelBody.addClass('hide').empty()
 
 
@@ -174,11 +191,11 @@ class AtomMinifyView extends View
 
         if reset
             @resetPanel()
-	    
+
         @panel.show()
 
 
-    hidePanel: (withDelay = false)->
+    hidePanel: (withDelay = false, reset = false)->
         clearTimeout(@automaticHidePanelTimeout)
 
         # We have to compare it to true because if close button is clicked, the withDelay
@@ -187,10 +204,14 @@ class AtomMinifyView extends View
             @automaticHidePanelTimeout = setTimeout =>
                 @hideThrobber()
                 @panel.hide()
+                if reset
+                    @resetPanel()
             , @options.autoHidePanelDelay
         else
             @hideThrobber()
             @panel.hide()
+            if reset
+                @resetPanel()
 
 
     setCaption: (text) ->
@@ -212,15 +233,15 @@ class AtomMinifyView extends View
                 @span class: spanClass, text
 
         if clickCallback
-            @find(".clickable-#{clickCounter}").on 'click', clickCallback
+            @find(".clickable-#{clickCounter}").on 'click', (evt) => clickCallback(evt)
 
 
-    hideCloseButton: ->
-        @panelClose.addClass('hide')
+    hideRightTopOptions: ->
+        @panelRightTopOptions.addClass('hide')
 
 
-    showCloseButton: ->
-        @panelClose.removeClass('hide')
+    showRightTopOptions: ->
+        @panelRightTopOptions.removeClass('hide')
 
 
     hideThrobber: ->

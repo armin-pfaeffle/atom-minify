@@ -1,3 +1,20 @@
+**0.3.0 - 22.08.2015**
+- General: Output path is automatically created when not existent
+- General: Reordering options in settings view
+- General: Minifiyng a unsaved file leads to a save dialog
+- New feature: Added inline parameters in a first-line-comment to override global settings
+- New feature: Detection of already minified file
+- New feature: 'Minify' item in Tree View context menu
+- New Option: Ask for overwriting already existent minified files
+- New Option: Ask for minification of already minified files
+- New Option: Show Minify-item in Tree View context menu
+- New Option: General output path
+- Improved panel: Better clickable lines for opening files
+- Improved panel: When trying opening file by clicking on filename and it does not exist, panel shows an corresponding information and does not open an empty file
+- Improved menu: Better menu usability and fixed visual binding problem
+- Bugfix: Added try-catch-block when deleting temporary files, so no `Uncaught Error` message occurs, see [issue #10](https://github.com/armin-pfaeffle/atom-minify/issues/10)
+- Bugfix: panel was still visible although nothing was minified
+
 **0.2.2 - 27.07.2015**
 - Fixed link in documentation
 

@@ -1,3 +1,5 @@
+/* filenamePattern: min/$1.minified.$2, outputPath: foo/bar */
+
 body {
     font-size: 10pt;
     }
@@ -10,7 +12,7 @@ body {
     }
 
 .content {
-    color: #f00
+    color: #f00;
     }
 
 .content > .child {
@@ -20,3 +22,4 @@ body {
 button {
     color: white
     }
+    

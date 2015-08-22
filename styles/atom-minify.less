@@ -5,19 +5,48 @@
 @import "ui-variables";
 
 .atom-minify {
+    .loading-spinner-tiny {
+        margin-left: 10px;
+    }
+
+    .right-top-options {
+        .btn-close {
+            height: 100%;
+        }
+    }
+
     .clickable {
         cursor: pointer;
+
+        &:hover {
+            & when (lightness(@inset-panel-background-color) >= 50%) {
+                background-color: darken(@inset-panel-background-color, 3%);
+            }
+            & when (lightness(@inset-panel-background-color) < 50%) {
+                background-color: lighten(@inset-panel-background-color, 3%);
+            }
+        }
+    }
+
+    .target-file-does-not-exist {
+        color: @text-color-error;
+
+        .hint {
+            color: #aaa;
+
+            &::before {
+                display: inline;
+                content: " — ";
+            }
+        }
     }
 
     .panel-body {
-        padding: 15px 10px;
+        padding: 10px 0;
 
         p {
-            margin: 8px 0 0 0;
-
-            &:first-child {
-                margin-top: 0;
-            }
+            margin: 0;
+            padding: 5px 10px;
         }
 
         .error-caption {
