@@ -159,9 +159,16 @@ class AtomMinifier
         if @isMinifyToFile()
             finalOutputPath = path.dirname(@outputFilename)
             parts = finalOutputPath.split(path.sep)
+
+            # If part[0] is an empty string, it's Darwin or Linux, so we set the tmpPath to
+            # root directory as starting point
             tmpPath = ''
+            if parts[0] is ''
+                parts.shift()
+                tmpPath = path.sep
+
             for folder in parts
-                tmpPath += (if tmpPath is '' then '' else path.sep) + folder
+                tmpPath += (if tmpPath in ['', path.sep] then '' else path.sep) + folder
                 if not fs.existsSync(tmpPath)
                     fs.mkdirSync(tmpPath)
 

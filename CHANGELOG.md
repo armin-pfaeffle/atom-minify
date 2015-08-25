@@ -1,3 +1,6 @@
+**0.3.1 - 25.08.2015**
+- Bugfix: Recursive creation of non-existent output directory failed on Darwin and Linux, see [issue #11](https://github.com/armin-pfaeffle/atom-minify/issues/11)
+
 **0.3.0 - 22.08.2015**
 - General: Output path is automatically created when not existent
 - General: Reordering options in settings view
