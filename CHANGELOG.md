@@ -1,3 +1,6 @@
+**0.4.1 - 01.09.2015**
+- Fixed documentation
+
 **0.4.0 - 01.09.2015**
 - New option: Advanced → Java path for defining an absolute path to a special Java installation
 - Minor improvements
