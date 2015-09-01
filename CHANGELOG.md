@@ -1,3 +1,7 @@
+**0.3.2 - 01.09.2015**
+- New option: Advanced → Java path for defining an absolute path to a special Java installation
+- Minor improvements
+
 **0.3.1 - 25.08.2015**
 - Bugfix: Recursive creation of non-existent output directory failed on Darwin and Linux, see [issue #11](https://github.com/armin-pfaeffle/atom-minify/issues/11)
 

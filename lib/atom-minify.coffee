@@ -188,6 +188,16 @@ module.exports =
             order: 84
 
 
+        # Advanced options
+
+        absoluteJavaPath:
+            title: 'Advanced → Java path'
+            description: 'Please only use if you need this option! You can enter an absolute path to your Java executable. Useful when you have more than one Java installation'
+            type: 'string'
+            default: ''
+            order: 100
+
+
     atomMinifyView: null
     mainSubmenu: null
     contextMenuItem: null

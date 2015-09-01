@@ -62,6 +62,9 @@ class AtomMinifyOptions
 
         @showStartMinificationNotification = AtomMinifyOptions.get('showStartMinificationNotification')
 
+        # Advanced options
+        @absoluteJavaPath = AtomMinifyOptions.get('absoluteJavaPath')
+
 
     parseCssMinifier: (minifier) ->
         switch minifier

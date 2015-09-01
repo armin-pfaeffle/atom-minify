@@ -323,7 +323,7 @@ class AtomMinifier
             @emitter.emit('start', emitterParameters)
 
             startTimestamp = new Date().getTime()
-            minifier.minify @inputFilename, @outputFilename, @options, (minifiedText, error) =>
+            minifier.minify @inputFilename, @outputFilename, (minifiedText, error) =>
                 statistics =
                     duration: new Date().getTime() - startTimestamp
 
@@ -394,7 +394,7 @@ class AtomMinifier
             when 'js' then moduleName = @options.jsMinifier
 
         minifierClass = require("./minifier/#{@contentType}/#{moduleName}")
-        minifier = new minifierClass()
+        minifier = new minifierClass(@options)
 
         return minifier
 
