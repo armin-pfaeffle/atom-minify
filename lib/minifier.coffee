@@ -381,7 +381,7 @@ class AtomMinifier
 
     deleteTemporaryFiles: (files) ->
         for file in files
-            if fs.existsSync
+            if fs.existsSync(file)
                 try
                     fs.unlinkSync(file)
                 catch e

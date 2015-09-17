@@ -1,3 +1,6 @@
+**0.4.2 - 17.09.2015**
+- Buxfix: Incorrect file existence check in delete file method
+
 **0.4.1 - 01.09.2015**
 - Fixed documentation
 
