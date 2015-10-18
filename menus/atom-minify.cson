@@ -30,6 +30,6 @@
         { 'label': 'Search in Directory', 'command': 'project-find:show-in-current-directory' }
         {'type': 'separator'}
 
-        {'label': 'Minifiy', 'command': 'atom-minify:minify-to-min-file', 'id': 'atom-minify-context-menu-minify' }
+        {'label': 'Minify', 'command': 'atom-minify:minify-to-min-file', 'id': 'atom-minify-context-menu-minify' }
         {'type': 'separator'}
     ]
