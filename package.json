@@ -1,7 +1,7 @@
 {
   "name": "atom-minify",
   "main": "./lib/atom-minify",
-  "version": "0.3.2",
+  "version": "0.5.0",
   "description": "Minifies JS and CSS files, optionally on save.",
   "repository": {
     "type": "git",
