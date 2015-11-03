@@ -7,7 +7,7 @@ class SqwishMinifier extends BaseMinifier
         return 'Sqwish'
 
 
-    minify: (inputFilename, outputFilename, options, callback) ->
+    minify: (inputFilename, outputFilename, callback) ->
         minified = undefined
         error = undefined
 

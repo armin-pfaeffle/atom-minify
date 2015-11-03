@@ -5,6 +5,9 @@
         'submenu': [
             { 'label': 'Minify to minified file', 'command': 'atom-minify:minify-to-min-file' }
             { 'label': 'Direct Minification', 'command': 'atom-minify:minify-direct' }
+
+            { 'type': 'separator' }
+
             { 'label': 'Enable minification on save', 'command': 'atom-minify:toggle-minify-on-save' }
 
             { 'type': 'separator' }
@@ -27,9 +30,5 @@
 
 'context-menu':
     '.tree-view': [
-        { 'label': 'Search in Directory', 'command': 'project-find:show-in-current-directory' }
-        {'type': 'separator'}
-
         {'label': 'Minify', 'command': 'atom-minify:minify-to-min-file', 'id': 'atom-minify-context-menu-minify' }
-        {'type': 'separator'}
     ]

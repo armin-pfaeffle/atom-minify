@@ -10,11 +10,8 @@
 
 # Mac OS
 '.platform-darwin atom-workspace atom-text-editor:not(.mini)':
-    # Default
     'ctrl-shift-m': 'atom-minify:minify-to-min-file'
     'cmd-shift-m': 'atom-minify:minify-direct'
-    'ctrl-cmd-shift-m': 'atom-minify:toggle-minify-on-save'
-    'ctrl-cmd-shift-h': 'atom-minify:close-panel'
 
     # Select CSS minifier
     'ctrl-cmd-shift-c ctrl-1': 'atom-minify:css-minifier-yui'
@@ -27,10 +24,13 @@
     'ctrl-cmd-shift-j ctrl-2': 'atom-minify:js-minifier-gcc'
     'ctrl-cmd-shift-j ctrl-3': 'atom-minify:js-minifier-uglifyjs2'
 
+'.platform-darwin':
+    'ctrl-cmd-shift-m': 'atom-minify:toggle-minify-on-save'
+    'ctrl-cmd-shift-h': 'atom-minify:close-panel'
+
 
 # Linux
 '.platform-linux atom-workspace atom-text-editor:not(.mini)':
-    # Default
     'ctrl-shift-m': 'atom-minify:minify-to-min-file'
     'alt-shift-m': 'atom-minify:minify-direct'
     'ctrl-alt-shift-m': 'atom-minify:toggle-minify-on-save'
@@ -46,15 +46,16 @@
     'ctrl-alt-shift-j ctrl-1': 'atom-minify:js-minifier-yui'
     'ctrl-alt-shift-j ctrl-2': 'atom-minify:js-minifier-gcc'
     'ctrl-alt-shift-j ctrl-3': 'atom-minify:js-minifier-uglifyjs2'
+
+'.platform-linux':
+    'ctrl-alt-shift-m': 'atom-minify:toggle-minify-on-save'
+    'ctrl-alt-shift-h': 'atom-minify:close-panel'
 
 
 # Windows
 '.platform-win32 atom-workspace atom-text-editor:not(.mini)':
-    # Default
     'ctrl-shift-m': 'atom-minify:minify-to-min-file'
     'alt-shift-m': 'atom-minify:minify-direct'
-    'ctrl-alt-shift-m': 'atom-minify:toggle-minify-on-save'
-    'ctrl-alt-shift-h': 'atom-minify:close-panel'
 
     # Select CSS minifier
     'ctrl-alt-shift-c ctrl-1': 'atom-minify:css-minifier-yui'
@@ -66,3 +67,7 @@
     'ctrl-alt-shift-j ctrl-1': 'atom-minify:js-minifier-yui'
     'ctrl-alt-shift-j ctrl-2': 'atom-minify:js-minifier-gcc'
     'ctrl-alt-shift-j ctrl-3': 'atom-minify:js-minifier-uglifyjs2'
+
+'.platform-win32':
+    'ctrl-alt-shift-m': 'atom-minify:toggle-minify-on-save'
+    'ctrl-alt-shift-h': 'atom-minify:close-panel'

@@ -10,19 +10,22 @@ class YuiJsMinifier extends BaseMinifier
         return 'YUI Compressor'
 
 
-    minify: (inputFilename, outputFilename, options, callback) ->
+    minify: (inputFilename, outputFilename, callback) ->
         minified = undefined
         error = undefined
 
-        @checkJavaInstalled((javaIsInstalled, version) =>
+        @checkJavaInstalled (javaIsInstalled, version) =>
             if not javaIsInstalled
-                error = 'You need to install Java in order to use YUI compressor.'
+                error = 'You need to install Java in order to use YUI compressor or set a correct path to Java exectuable in options.'
                 callback(minified, error)
             else
                 exec = require('child_process').exec
-                command = 'java -jar -Xss2048k "' + __dirname + '/../_bin/yuicompressor-2.4.7.jar" "' + inputFilename + '" -o "' + outputFilename + '" --type js'
-                exec(command,
-                    maxBuffer: options.buffer,
+
+                java = if @options.absoluteJavaPath then '"' + @options.absoluteJavaPath + '"' else 'java'
+                command = java + ' -jar -Xss2048k "' + __dirname + '/../_bin/yuicompressor-2.4.7.jar" "' + inputFilename + '" -o "' + outputFilename + '" --type js'
+
+                exec command,
+                    maxBuffer: @options.buffer,
                     (err, stdout, stderr) =>
                         if err
                             error = err.toString()
@@ -31,5 +34,3 @@ class YuiJsMinifier extends BaseMinifier
                             minified = fs.readFileSync(outputFilename).toString()
 
                         callback(minified, error)
-                )
-        )

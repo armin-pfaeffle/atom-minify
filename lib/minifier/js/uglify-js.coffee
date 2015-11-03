@@ -7,7 +7,7 @@ class UglifyJsMinifier extends BaseMinifier
         return 'UglifyJS2'
 
 
-    minify: (inputFilename, outputFilename, options, callback) ->
+    minify: (inputFilename, outputFilename, callback) ->
         minified = undefined
         error = undefined
 

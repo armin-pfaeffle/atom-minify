@@ -4,6 +4,7 @@ AtomMinifyInlineParameters = require('./inline-parameters')
 
 fs = require('fs')
 path = require('path')
+file = require('./file')
 
 
 module.exports =
@@ -20,97 +21,89 @@ class AtomMinifier
         @emitter = new Emitter()
 
 
+    destroy: () ->
+        @emitter.dispose()
+        @emitter = null
+
+
     # If filename is null then active text editor is used for minification
     minify: (mode, minifyOnSave = false, filename = null) ->
         @mode = mode
         @minifyOnSave = minifyOnSave
-        @inputFilename = @getInputFilename(filename)
+        @contentType = undefined
+        @setupInputFile(filename)
 
-        # inputFilename is always set, it's not if valid content is the target
-        if @inputFilename and @detectContentType()
+        # If no inputFile.path is given, then we cannot compile the file or content, because something
+        # is wrong
+        if not @inputFile.path
+            @throwMessageAndFinish('error', 'Invalid file: ' + @inputFile.path)
+
+        # Check file existance
+        else if not fs.existsSync(@inputFile.path)
+            @throwMessageAndFinish('error', 'File does not exist: ' + @inputFile.path)
+
+
+        else
+            # If content type cannot automatically be detected, user is asked for content type. If he
+            # cancels the request, no content type is given, so we do not have to throw any messsage.
+            if not @detectContentType()
+                @emitter.emit('finished', @getBasicEmitterParameters())
+                return
+
             if @isMinifyToFile()
-                #
-                # TODO: den ensureFileIsSaved Check nur dann machen, wenn der Inhalt in einer Datei
-                # gespeichert ist. Denn wenn der Inhalt in einem neuen Tab steht und dann minimiert
-                # wird, sollte immer die Minimierung durchgeführt werden. Evtl. kann ja danach
-                # dann der Save-Dialog erscheinen.
-                #
-
                 # If a file should be minified to another, the file must be saved, else only direct
                 # minification is available. The reason for this is that building a minified
                 # filename is based on the existant filename
                 if not @ensureFileIsSaved()
+                    @emitter.emit('finished', @getBasicEmitterParameters())
                     return
 
                 if not @checkAlreadyMinifiedFile()
+                    @emitter.emit('finished', @getBasicEmitterParameters())
                     return
 
+            parameters = new AtomMinifyInlineParameters()
+            parameters.parse @inputFile.path, (params, error) =>
+                if error
+                    @throwMessageAndFinish('error', error)
 
-            @updateOptionsWithInlineParameters () =>
-                @outputFilename = @getOutputFilename()
-
-                if @isMinifyToFile() and not @checkOutputFileAlreadyExists()
-                    return
-
-                # Ensure valid directory
-                @ensureTargetDirectoryExists()
-
-                if @options.compress isnt undefined and @options.compress is false
-                    # Only write unminified text if target is a file, else it does not make
-                    # any sense
-                    if @isMinifyToFile()
-                        @writeUnminifiedText()
                 else
-                    @writeMinifiedText()
+                    @updateOptionsWithInlineParameters(params)
+                    @setupOutputFile()
+
+                    if @isMinifyToFile() and not @checkOutputFileAlreadyExists()
+                        @emitter.emit('finished', @getBasicEmitterParameters())
+                        return
+
+                    @ensureOutputDirectoryExists()
+
+                    if @options.compress isnt undefined and @options.compress is false
+                        # Only write unminified text if target is a file, else it does not make
+                        # any sense
+                        if @isMinifyToFile()
+                            @writeUnminifiedText()
+                    else
+                        @writeMinifiedText()
 
 
-    detectContentType: ->
-        @contentType = null
+    setupInputFile: (filename = null) ->
+        @inputFile =
+            isTemporary: false
 
-        # We don't return if inputFilename is empty because user you should be aable to minify
-        # text of a new opened, but unsaved tab
-        if @isMinifyDirect()
+        if filename
+            @inputFile.path = filename
+        else
             activeEditor = atom.workspace.getActiveTextEditor()
-            if activeEditor and activeEditor.getURI()
-                filename = activeEditor.getURI()
-                if filename and fs.existsSync(filename)
-                    fileExtension = path.extname(filename).toLowerCase()
-        else if @inputFilename
-            fileExtension = path.extname(@inputFilename).toLowerCase()
+            return unless activeEditor
 
-        # Detect content type by file extension or ask user
-        # BUT we only ask the user to select content type, if minification is not startet via
-        # saving file
-        switch fileExtension
-            when '.css' then @contentType = 'css'
-            when '.js' then @contentType = 'js'
+            if @isMinifyDirect()
+                @inputFile.path = file.getTemporaryFilename('atom-minify.input.')
+                @inputFile.isTemporary = true
+                fs.writeFileSync(@inputFile.path, activeEditor.getText())
             else
-                if not @isMinifyOnSave()
-                    dialogResultButton = atom.confirm
-                        message: "Can not detect content type. Tell me which minifier should be used for minification?"
-                        buttons: ["Cancel", "CSS", "JS"]
-                    switch dialogResultButton
-                        when 1 then @contentType = 'css'
-                        when 2 then @contentType = 'js'
-
-        return @contentType isnt null
-
-
-    ensureFileIsSaved: () ->
-        editors = atom.workspace.getTextEditors()
-        for editor in editors
-            if editor and editor.getURI and editor.getURI() is @inputFilename and editor.isModified()
-                dialogResultButton = atom.confirm
-                    message: "'#{editor.getTitle()}' has changes, do you want to save them?"
-                    detailedMessage: "In order to minify a file you have to save changes."
-                    buttons: ["Save and minify", "Cancel"]
-                if dialogResultButton is 0
-                    editor.save()
-                    break
-                else
-                    return false
-
-        return true
+                @inputFile.path = activeEditor.getURI()
+                if not @inputFile.path
+                    @inputFile.path = @askForSavingUnsavedFileInActiveEditor()
 
 
     askForSavingUnsavedFileInActiveEditor: () ->
@@ -133,62 +126,71 @@ class AtomMinifier
         return undefined
 
 
+    detectContentType: ->
+        @contentType = undefined
+
+        # We don't return if inputFile.path is empty because user you should be able to minify
+        # text of a new opened, but unsaved tab
+        if @isMinifyDirect()
+            activeEditor = atom.workspace.getActiveTextEditor()
+            if activeEditor and activeEditor.getURI()
+                filename = activeEditor.getURI()
+                if filename and fs.existsSync(filename)
+                    fileExtension = path.extname(filename).toLowerCase()
+        else if @inputFile.path
+            fileExtension = path.extname(@inputFile.path).toLowerCase()
+
+        # Detect content type by file extension or ask user
+        # BUT we only ask the user to select content type, if minification is not startet via
+        # saving file
+        switch fileExtension
+            when '.css' then @contentType = 'css'
+            when '.js' then @contentType = 'js'
+            else
+                if not @isMinifyOnSave()
+                    @contentType = @askForContentType()
+
+        return @contentType isnt undefined
+
+
+    askForContentType: () ->
+        dialogResultButton = atom.confirm
+            message: "Can not detect content type. Tell me which minifier should be used for minification?"
+            buttons: ["CSS", "JS", "Cancel"]
+        switch dialogResultButton
+            when 0 then type = 'css'
+            when 1 then type = 'js'
+            else type = undefined
+        return type
+
+
+    ensureFileIsSaved: () ->
+        editors = atom.workspace.getTextEditors()
+        for editor in editors
+            if editor and editor.getURI and editor.getURI() is @inputFile.path and editor.isModified()
+                filename = path.basename(@inputFile.path)
+                dialogResultButton = atom.confirm
+                    message: "'#{filename}' has changes, do you want to save them?"
+                    detailedMessage: "In order to minify a file you have to save changes."
+                    buttons: ["Save and minify", "Cancel"]
+                if dialogResultButton is 0
+                    editor.save()
+                    break
+                else
+                    return false
+
+        return true
+
+
     checkAlreadyMinifiedFile: () ->
         if @options.checkAlreadyMinifiedFile
-            if /\.(?:min|minified|compressed)\./i.exec(@inputFilename) isnt null
+            if /\.(?:min|minified|compressed)\./i.exec(@inputFile.path) isnt null
                 dialogResultButton = atom.confirm
                     message: "The filename indicates that content is already minified. Minify again?"
                     detailedMessage: "The filename contains one of the following parts: '.min.', '.minified.', '.compressed.'"
                     buttons: ["Minify", "Cancel"]
                 return dialogResultButton is 0
         return true
-
-
-    checkOutputFileAlreadyExists: () ->
-        if @options.checkOutputFileAlreadyExists
-            if fs.existsSync(@outputFilename)
-                dialogResultButton = atom.confirm
-                    message: "The output filename already exists. Do you want to overwrite it?"
-                    detailedMessage: "Output filename: '#{@outputFilename}'"
-                    buttons: ["Overwrite", "Cancel"]
-                return dialogResultButton is 0
-        return true
-
-
-    ensureTargetDirectoryExists: () ->
-        if @isMinifyToFile()
-            finalOutputPath = path.dirname(@outputFilename)
-            parts = finalOutputPath.split(path.sep)
-
-            # If part[0] is an empty string, it's Darwin or Linux, so we set the tmpPath to
-            # root directory as starting point
-            tmpPath = ''
-            if parts[0] is ''
-                parts.shift()
-                tmpPath = path.sep
-
-            for folder in parts
-                tmpPath += (if tmpPath in ['', path.sep] then '' else path.sep) + folder
-                if not fs.existsSync(tmpPath)
-                    fs.mkdirSync(tmpPath)
-
-
-    getInputFilename: (filename = null) ->
-        if filename
-            inputFilename = filename
-        else
-            activeEditor = atom.workspace.getActiveTextEditor()
-            return unless activeEditor
-
-            if @isMinifyDirect()
-                inputFilename = @getTemporaryFilename('input')
-                fs.writeFileSync(inputFilename, activeEditor.getText())
-            else
-                inputFilename = activeEditor.getURI()
-                if not inputFilename
-                    inputFilename = @askForSavingUnsavedFileInActiveEditor()
-
-        return inputFilename
 
 
     # Available parameters
@@ -198,76 +200,73 @@ class AtomMinifier
     #   minifier
     #   minifierOptions
     #   buffer
-    updateOptionsWithInlineParameters: (callback) ->
-        parameters = new AtomMinifyInlineParameters()
-        parameters.parse @inputFilename, (params, error) =>
-            if error
-                emitterParameters = @getBasicEmitterParameters('none', { error: error })
-                @emitter.emit('error', emitterParameters)
-                return
+    updateOptionsWithInlineParameters: (params) ->
+        # compress / uncompressed
+        if params.compress is false or params.uncompressed is true
+            @options.compress = false
 
-            if params
-                # compress / uncompressed
-                if params.compress is false or params.uncompressed is true
-                    @options.compress = false
+        # filename pattern
+        if typeof params.filenamePattern is 'string' and params.filenamePattern.length > 0
+            switch @contentType
+                when 'css' then @options.cssMinifiedFilenamePattern = params.filenamePattern
+                when 'js' then @options.jsMinifiedFilenamePattern = params.filenamePattern
 
-                # filename pattern
-                if typeof params.filenamePattern is 'string' and params.filenamePattern.length > 0
-                    switch @contentType
-                        when 'css' then @options.cssMinifiedFilenamePattern = params.filenamePattern
-                        when 'js' then @options.jsMinifiedFilenamePattern = params.filenamePattern
+        # output path
+        if typeof params.outputPath is 'string' and params.outputPath.length > 0
+            @options.outputPath = params.outputPath
 
-                # output path
-                if typeof params.outputPath is 'string' and params.outputPath.length > 0
-                    @options.outputPath = params.outputPath
+        # minifier
+        if typeof params.minifier is 'string'
+            isUnknownMinifier = true
+            switch @contentType
+                when 'css'
+                    if params.minifier in ['clean-css', 'csso', 'sqwish', 'yui-css']
+                        @options.cssMinifier = params.minifier
+                        isUnknownMinifier = false
+                when 'js'
+                    if params.minifier in ['gcc', 'uglify-js', 'yui-js']
+                        @options.jsMinifier = params.minifier
+                        isUnknownMinifier = false
 
-                # minifier
-                if typeof params.minifier is 'string' and params.minifier.length > 0
-                    isUnknownMinifier = true
-                    switch @contentType
-                        when 'css'
-                            if params.minifier in ['clean-css', 'csso', 'sqwish', 'yui-css']
-                                @options.cssMinifier = params.minifier
-                                isUnknownMinifier = false
-                        when 'js'
-                            if params.minifier in ['gcc', 'uglify-js', 'yui-js']
-                                @options.jsMinifier = params.minifier
-                                isUnknownMinifier = false
+            if isUnknownMinifier
+                warningMessage = "Unknown minifier '#{params.minifier}' in first-line-parameters; using default minifier for minification"
+                @emitter.emit('warning', @getBasicEmitterParameters({ message: warningMessage }))
 
-                    if isUnknownMinifier
-                        error = "Unknown minifier '#{params.minifier}' in first-line-parameters"
-                        emitterParameters = @getBasicEmitterParameters('none', { error: error })
-                        @emitter.emit('error', emitterParameters)
-                        return
+        # minifier options
+        if typeof params.minifierOptions is 'string' and params.minifierOptions.length > 0
+            switch @contentType
+                when 'css'
+                    switch @options.cssMinifier
+                        when 'clean-css' then @options.cssParametersForCleanCSS += ' ' + params.minifierOptions
+                        when 'csso' then @options.cssParametersForCSSO += ' ' + params.minifierOptions
+                        when 'sqwish' then @options.cssParametersForSqwish += ' ' + params.minifierOptions
+                        when 'yui-css' then @options.cssParametersForYUI += ' ' + params.minifierOptions
 
-                # minifier options
-                if typeof params.minifierOptions is 'string' and params.minifierOptions.length > 0
-                    switch @contentType
-                        when 'css'
-                            switch @options.cssMinifier
-                                when 'clean-css' then @options.cssParametersForCleanCSS += ' ' + params.minifierOptions
-                                when 'csso' then @options.cssParametersForCSSO += ' ' + params.minifierOptions
-                                when 'sqwish' then @options.cssParametersForSqwish += ' ' + params.minifierOptions
-                                when 'yui-css' then @options.cssParametersForYUI += ' ' + params.minifierOptions
+                when 'js'
+                    switch @options.jsMinifier
+                        when 'gcc' then @options.jsParametersForGCC += ' ' + params.minifierOptions
+                        when 'uglify-js' then @options.jsParametersForUglifyJS2 += ' ' + params.minifierOptions
+                        when 'yui-js' then @options.jsParametersForYUI += ' ' + params.minifierOptions
 
-                        when 'js'
-                            switch @options.jsMinifier
-                                when 'gcc' then @options.jsParametersForGCC += ' ' + params.minifierOptions
-                                when 'uglify-js' then @options.jsParametersForUglifyJS2 += ' ' + params.minifierOptions
-                                when 'yui-js' then @options.jsParametersForYUI += ' ' + params.minifierOptions
-
-                # buffer
-                if typeof params.buffer is 'number' and params.buffer >= 1024*1024
-                    @options.buffer = params.buffer
-
-            callback()
+        # buffer
+        if typeof params.buffer is 'number' and params.buffer >= 1024*1024
+            if params.buffer >= 1024*1024
+                @options.buffer = params.buffer
+            else
+                # TODO: test
+                warningMessage = 'Parameter \'buffer\' must be greater or equal than 1024 * 1024'
+                @emitter.emit('warning', @getBasicEmitterParameters({ message: warningMessage }))
 
 
-    getOutputFilename: ->
+    setupOutputFile: ->
+        @outputFile =
+            isTemporary: false
+
         if @isMinifyDirect()
-            minifiedFilename = @getTemporaryFilename('output')
+            @outputFile.path = file.getTemporaryFilename('atom-minify.output.', null, @contentType)
+            @outputFile.isTemporary = true
         else
-            basename = path.basename(@inputFilename)
+            basename = path.basename(@inputFile.path)
             # we need the file extension without the dot!
             fileExtension = path.extname(basename).replace('.', '')
 
@@ -282,119 +281,126 @@ class AtomMinifier
             if fileExtension is ''
                 basename += @contentType
 
-            outputPath = path.dirname(@inputFilename)
+            outputPath = path.dirname(@inputFile.path)
             if @options.outputPath
                 if path.isAbsolute(@options.outputPath)
                     outputPath = @options.outputPath
                 else
                     outputPath = path.join(outputPath, @options.outputPath)
 
-            minifiedFilename = path.join(outputPath, basename)
+            @outputFile.path = path.join(outputPath, basename)
 
-        return minifiedFilename
+
+    checkOutputFileAlreadyExists: () ->
+        if @options.checkOutputFileAlreadyExists
+            if fs.existsSync(@outputFile.path)
+                dialogResultButton = atom.confirm
+                    message: "The output file already exists. Do you want to overwrite it?"
+                    detailedMessage: "Output file: '#{@outputFile.path}'"
+                    buttons: ["Overwrite", "Cancel"]
+                return dialogResultButton is 0
+        return true
+
+
+    ensureOutputDirectoryExists: () ->
+        if @isMinifyToFile()
+            outputPath = path.dirname(@outputFile.path)
+            file.ensureDirectoryExists(outputPath)
 
 
     writeUnminifiedText: () ->
         dummyMinifierName = 'uncompressed'
-        emitterParameters = @getBasicEmitterParameters(dummyMinifierName)
 
-        @emitter.emit('start', emitterParameters)
+        @emitter.emit('start', @getBasicEmitterParameters({ minifierName : dummyMinifierName }))
         try
             startTimestamp = new Date().getTime()
             activeEditor = atom.workspace.getActiveTextEditor()
-            fs.writeFileSync(@outputFilename, activeEditor.getText())
+            fs.writeFileSync(@outputFile.path, activeEditor.getText())
 
             statistics =
                 duration: new Date().getTime() - startTimestamp,
-                before: @getFileSizeInByte(@inputFilename),
-                after: @getFileSizeInByte(@outputFilename)
+                before: file.getFileSize(@inputFile.path),
+                after: file.getFileSize(@outputFile.path)
 
-            emitterParameters.statistics = statistics
-            @emitter.emit('success', emitterParameters)
+            @emitter.emit('success', @getBasicEmitterParameters({ minifierName: dummyMinifierName, statistics: statistics }))
         catch error
-            emitterParameters.error = error
-            @emitter.emit('error', emitterParameters)
+            @emitter.emit('error', @getBasicEmitterParameters({ minifierName: dummyMinifierName, message: error }))
+
+        @emitter.emit('finished', @getBasicEmitterParameters())
 
 
     writeMinifiedText: () ->
-        minifier = @getMinifier()
-        emitterParameters = @getBasicEmitterParameters(minifier.getName())
+        minifier = @buildMinifierInstance()
         try
-            @emitter.emit('start', emitterParameters)
+            @emitter.emit('start', @getBasicEmitterParameters({ minifierName : minifier.getName() }))
 
             startTimestamp = new Date().getTime()
-            minifier.minify @inputFilename, @outputFilename, @options, (minifiedText, error) =>
-                statistics =
-                    duration: new Date().getTime() - startTimestamp
-
-                # Delete temporary created file, even if there was an error
-                if @isMinifyDirect()
-                    @deleteTemporaryFiles([@inputFilename, @outputFilename])
-
-                if error
-                    emitterParameters.error = error
-                    @emitter.emit('error', emitterParameters)
-                else
-                    if @isMinifyDirect()
-                        # Calc saving BEFORE we edit the text editors text
-                        statistics.before = atom.workspace.getActiveTextEditor().getText().length
-                        statistics.after = minifiedText.length
-
-                        # Apply text but do NOT save it
-                        atom.workspace.getActiveTextEditor().setText(minifiedText)
+            minifier.minify @inputFile.path, @outputFile.path, (minifiedText, error) =>
+                try
+                    if error
+                        @emitter.emit('error', @getBasicEmitterParameters({ message: error }))
                     else
-                        statistics.before = @getFileSizeInByte(@inputFilename)
-                        statistics.after = @getFileSizeInByte(@outputFilename)
+                        statistics =
+                            duration: new Date().getTime() - startTimestamp
 
-                    emitterParameters.statistics = statistics
-                    @emitter.emit('success', emitterParameters)
+                        if @isMinifyDirect()
+                            # Calc saving BEFORE we edit the text editors text
+                            statistics.before = atom.workspace.getActiveTextEditor().getText().length
+                            statistics.after = minifiedText.length
+
+                            # Apply text but do NOT save it
+                            atom.workspace.getActiveTextEditor().setText(minifiedText)
+                        else
+                            statistics.before = file.getFileSize(@inputFile.path)
+                            statistics.after = file.getFileSize(@outputFile.path)
+
+                        @emitter.emit('success', @getBasicEmitterParameters({ minifierName : minifier.getName(), statistics: statistics }))
+                finally
+                    @deleteTemporaryFiles()
+                    @emitter.emit('finished', @getBasicEmitterParameters())
         catch e
-            emitterParameters.error = e.toString()
-            @emitter.emit('error', emitterParameters)
+            @emitter.emit('error', @getBasicEmitterParameters({ minifierName : minifier.getName(), message: e.toString() }))
+            @emitter.emit('finished', @getBasicEmitterParameters())
 
 
-    getBasicEmitterParameters: (minifierName, furtherParameters = {}) ->
+    throwMessageAndFinish: (type, message) ->
+        @deleteTemporaryFiles()
+        @emitter.emit(type, @getBasicEmitterParameters({ message: message }))
+        @emitter.emit('finished', @getBasicEmitterParameters())
+
+
+    deleteTemporaryFiles: ->
+        if @inputFile and @inputFile.isTemporary
+            file.delete(@inputFile.path)
+        if @outputFile and @outputFile.isTemporary
+            file.delete(@outputFile.path)
+
+
+    getBasicEmitterParameters: (additionalParameters = {}) ->
         parameters =
             isMinifyToFile: @isMinifyToFile(),
             isMinifyDirect: @isMinifyDirect(),
-            contentType: @contentType,
-            minifierName: minifierName,
-            inputFilename: @inputFilename
 
-        if @outputFilename
-            parameters.outputFilename = @outputFilename
+        if @inputFile
+            parameters.inputFilename = @inputFile.path
+        if @contentType
+            parameters.contentType = @contentType
+        if @outputFile
+            parameters.outputFilename = @outputFile.path
 
-        for key, value of furtherParameters
+        for key, value of additionalParameters
             parameters[key] = value
 
         return parameters
 
 
-    getTemporaryFilename: (filenameAddition) ->
-        os = require('os')
-        uuid = require('node-uuid')
-        uniqueId = uuid.v4()
-        filename = "atom-minify.#{uniqueId}.#{filenameAddition}.tmp"
-        filename = path.join(os.tmpdir(), filename)
-        return filename
-
-
-    deleteTemporaryFiles: (files) ->
-        for file in files
-            if fs.existsSync
-                try
-                    fs.unlinkSync(file)
-                catch e
-                    # do nothing here, if an error occurs
-
-
-    getMinifier: () ->
+    buildMinifierInstance: () ->
         switch @contentType
             when 'css' then moduleName = @options.cssMinifier
             when 'js' then moduleName = @options.jsMinifier
 
         minifierClass = require("./minifier/#{@contentType}/#{moduleName}")
-        minifier = new minifierClass()
+        minifier = new minifierClass(@options)
 
         return minifier
 
@@ -411,19 +417,21 @@ class AtomMinifier
         return @mode is AtomMinifier.MINIFY_TO_MIN_FILE
 
 
-    getFileSizeInByte: (filename) ->
-        statistics = fs.statSync(filename)
-        fileSize = statistics['size']
-        return fileSize
-
-
     onStart: (callback) ->
         @emitter.on 'start', callback
+
+
+    onSuccess: (callback) ->
+        @emitter.on 'success', callback
+
+
+    onWarning: (callback) ->
+        @emitter.on 'warning', callback
 
 
     onError: (callback) ->
         @emitter.on 'error', callback
 
 
-    onSuccess: (callback) ->
-        @emitter.on 'success', callback
+    onFinished: (callback) ->
+        @emitter.on 'finished', callback

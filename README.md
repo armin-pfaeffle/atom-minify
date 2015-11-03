@@ -141,6 +141,9 @@ Decide when you want the notifications to automatically hide. Else you have to c
 If enabled and you added the notification option in `Notifications`, you will see an info-message when minification process starts.  
 *__Default__: false*
 
+- #### Advanced → Java path
+If you have more than one Java installation or you have a special constellation, you can use this option to define a path to a Java executable. This executable is used for YUI and GCC minifiers.  
+*__Default__: ''*
 
 
 ## Inline-parameters
@@ -277,8 +280,27 @@ For other concerns like questions or feeback [have a look at the discussion thre
 
 ## Changelog
 
-**0.3.2 - 19.10.2015**
-- Fixed typo
+**0.5.0 - 27.10.2015**
+- Optimized parameter parsing
+- Improved shortcuts
+- Improved notification panel
+- Improved main menu entry
+- Improved notifications
+- Bugfix: "Minify" item in Tree View context menu was not always visible on file items
+- Bugfix: "Minify" item in Tree View context menu was not working correctly
+- Bugfix: Multiple minifcation were possible
+- Bugfix: Opening file by clicking on panel notification could fail
+- Minor improvements and bugfixes
+
+**0.4.2 - 17.09.2015**
+- Buxfix: Incorrect file existence check in delete file method
+
+**0.4.1 - 01.09.2015**
+- Fixed documentation
+
+**0.4.0 - 01.09.2015**
+- New option: Advanced → Java path for defining an absolute path to a special Java installation
+- Minor improvements
 
 **0.3.1 - 25.08.2015**
 - Bugfix: Recursive creation of non-existent output directory failed on Darwin and Linux, see [issue #11](https://github.com/armin-pfaeffle/atom-minify/issues/11)
@@ -286,7 +308,7 @@ For other concerns like questions or feeback [have a look at the discussion thre
 **0.3.0 - 22.08.2015**
 - General: Output path is automatically created when not existent
 - General: Reordering options in settings view
-- General: Minifyng a unsaved file leads to a save dialog
+- General: Minifiyng a unsaved file leads to a save dialog
 - New feature: Added inline parameters in a first-line-comment to override global settings
 - New feature: Detection of already minified file
 - New feature: 'Minify' item in Tree View context menu

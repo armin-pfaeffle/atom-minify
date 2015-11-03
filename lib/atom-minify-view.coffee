@@ -1,5 +1,7 @@
 {$, $$, View} = require('atom-space-pen-views')
 
+fs = require('fs')
+
 module.exports =
 class AtomMinifyView extends View
 
@@ -50,6 +52,8 @@ class AtomMinifyView extends View
 
 
     startMinification: (args) ->
+        @hasError = false
+
         if @options.showStartMinificationNotification
             if args.isMinifyDirect
                 @showInfoNotification('Start direct minification')
@@ -65,12 +69,26 @@ class AtomMinifyView extends View
                     @addText('Start direct minification', 'terminal', 'info',)
 
 
+    warning: (args) ->
+        if @options.showWarningNotification
+            @showWarningNotification('Warning', args.message)
+
+        if @options.showPanel
+            @showPanel()
+            if args.inputFilename
+                @addText(args.message, 'issue-opened', 'warning', (evt) => @openFile(args.inputFilename, evt.target))
+            else
+                @addText(args.message, 'issue-opened', 'warning')
+
+
     successfullMinification: (args) ->
         saving = @obtainSaving(args)
 
         successMessage = "Successfully minified"
         if @options.showSavingInfo
-            successMessage = "Minification saved #{saving.percentage}% in #{args.statistics.duration}ms / #{saving.before} #{saving.unit} → #{saving.after} #{saving.unit}"
+            successMessage = "Minification saved #{saving.percentage}% in #{args.statistics.duration}ms"
+            successMessage += "before: #{saving.before} #{saving.unit}"
+            successMessage += "after:  #{saving.after} #{saving.unit}"
         if args.isMinifyDirect
             details = "Compressor: #{args.minifierName}"
         else
@@ -79,36 +97,48 @@ class AtomMinifyView extends View
 
         if @options.showPanel
             @showPanel()
-            @setCaption('Successfully minified')
-            @hideThrobber()
-            @showRightTopOptions()
 
-            if args.isMinifyToFile
-                @addText args.outputFilename, 'check', 'success', (evt) => @openFile(args.outputFilename, evt.target)
-            else
-                @addText('Successfully minified!', 'check', 'success')
-            if @options.showSavingInfo
-                savingMessage = "Saved #{saving.percentage}% in #{args.statistics.duration}ms — before: #{saving.before} #{saving.unit} / after: #{saving.after} #{saving.unit} — Minifier: #{args.minifierName}"
-                @addText(savingMessage, undefined, 'saving-info')
+            # We have to store this value in a local variable, beacuse $$ methods can not see @options
+            showSavingInfo = @options.showSavingInfo
 
-            if @options.autoHidePanelOnSuccess
-                @hidePanel(true)
+            message = $$ ->
+                @div class: 'success-text-wrapper', =>
+                    @p class: 'icon icon-check text-success', =>
+                        if args.isMinifyToFile
+                            @span class: '', args.outputFilename
+                        else
+                            @span class: '', 'Successfully minified!'
+
+                    if showSavingInfo
+                        @p class: 'success-details text-info', =>
+                            @span class: 'success-saved-percentage', =>
+                                @span 'Saved: '
+                                @span class: 'value', saving.percentage + '%'
+                            @span class: 'success-duration', =>
+                                @span 'Duration: '
+                                @span class: 'value', args.statistics.duration + ' ms'
+                            @span class: 'success-size-before', =>
+                                @span 'Size before: '
+                                @span class: 'value', saving.before + ' ' + saving.unit
+                            @span class: 'success-size-after', =>
+                                @span 'Size after: '
+                                @span class: 'value', saving.after + ' ' + saving.unit
+                            @span class: 'success-minifier', =>
+                                @span 'Minifier: '
+                                @span class: 'value', args.minifierName
+
+            @addText(message, 'check', 'success', (evt) => @openFile(args.outputFilename, evt.target))
 
 
     erroneousMinification: (args) ->
+        @hasError = true
         caption = 'Minification error' + if args.minifierName then ' — ' + args.minifierName else ''
-        @showErrorNotification(caption, args.error)
+        @showErrorNotification(caption, args.message)
 
         if @options.showPanel
             @showPanel()
-            @setCaption(caption)
-            @hideThrobber()
-            @showRightTopOptions()
 
-            @addText(args.error, 'alert', 'error')
-
-            if @options.autoHidePanelOnError
-                @hidePanel(true)
+            @addText(args.message, 'alert', 'error')
 
 
     obtainSaving: (args) ->
@@ -131,13 +161,25 @@ class AtomMinifyView extends View
 
         return saving
 
+    finished: (args) ->
+        if @hasError
+            @setCaption('Minification error')
+            if @options.autoHidePanelOnError
+                @hidePanel(true)
+        else
+            @setCaption('Successfully minified')
+            if @options.autoHidePanelOnSuccess
+                @hidePanel(true)
 
-    openFile: (filename, targetElement) ->
-        fs = require('fs')
+        @hideThrobber()
+        @showRightTopOptions()
+
+
+    openFile: (filename, targetElement = null) ->
         fs.exists filename, (exists) =>
             if exists
                 atom.workspace.open filename
-            else
+            else if targetElement
                 target = $(targetElement)
                 if not target.is('p.clickable')
                     target = target.parent()
@@ -228,9 +270,15 @@ class AtomMinifyView extends View
         if textClass
             spanClass = spanClass + (if spanClass isnt '' then ' ' else '') + "text-#{textClass}"
 
-        @panelBody.removeClass('hide').append $$ ->
-            @p class: wrapperClass, =>
-                @span class: spanClass, text
+        if typeof text is 'object'
+            wrapper = $$ ->
+                @div class: wrapperClass
+            wrapper.append(text)
+            @panelBody.removeClass('hide').append(wrapper)
+        else
+            @panelBody.removeClass('hide').append $$ ->
+                @p class: wrapperClass, =>
+                    @span class: spanClass, text
 
         if clickCallback
             @find(".clickable-#{clickCounter}").on 'click', (evt) => clickCallback(evt)

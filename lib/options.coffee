@@ -48,6 +48,7 @@ class AtomMinifyOptions
         # Notification options
         @showInfoNotification = AtomMinifyOptions.get('notifications') in ['Notifications', 'Panel, Notifications']
         @showSuccessNotification = AtomMinifyOptions.get('notifications') in ['Notifications', 'Panel, Notifications']
+        @showWarningNotification = AtomMinifyOptions.get('notifications') in ['Notifications', 'Panel, Notifications']
         @showErrorNotification = AtomMinifyOptions.get('notifications') in ['Notifications', 'Panel, Notifications']
 
         @autoHideInfoNotification = AtomMinifyOptions.get('autoHideNotifications') in ['Info, Success', 'Info, Success, Error']
@@ -61,6 +62,9 @@ class AtomMinifyOptions
         @autoHidePanelDelay = AtomMinifyOptions.get('autoHidePanelDelay')
 
         @showStartMinificationNotification = AtomMinifyOptions.get('showStartMinificationNotification')
+
+        # Advanced options
+        @absoluteJavaPath = AtomMinifyOptions.get('absoluteJavaPath')
 
 
     parseCssMinifier: (minifier) ->

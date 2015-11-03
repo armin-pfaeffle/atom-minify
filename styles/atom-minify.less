@@ -46,7 +46,43 @@
 
         p {
             margin: 0;
-            padding: 5px 10px;
+            padding: 4px 10px;
+        }
+
+        .success-text-wrapper {
+
+            .success-details {
+                color: #888;
+
+                .success-saved-percentage {
+                    padding: 0 0 0 21px;
+                }
+
+                .success-duration {
+                    padding: 0 0 0 12px;
+                }
+
+                .success-size-before {
+                    padding: 0 0 0 12px;
+                }
+
+                .success-size-after {
+                    padding: 0 0 0 12px;
+                }
+
+                .success-minifier {
+                    padding: 0 0 0 12px;
+                }
+
+                .success-file-size {
+                    padding: 0 0 0 12px;
+                }
+
+                .value {
+                    padding: 0 0 0 3px;
+                    font-weight: bold;
+                }
+            }
         }
 
         .error-caption {
@@ -56,9 +92,29 @@
             padding: 0 0 0 7px;
         }
 
-        .text-saving-info {
-            padding: 0 0 0 21px;
-            color: #aaa;
+        .error-file-wrapper {
+            padding-left: 21px;
+        }
+
+        .error-file {
+            padding: 0 7px;
+        }
+
+        .error-line {
+
+            &::before {
+                content: '(';
+            }
+
+            &::after {
+                content: ', ';
+            }
+        }
+
+        .error-column {
+            &::after {
+                content: ')';
+            }
         }
     }
 }

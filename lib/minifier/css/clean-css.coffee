@@ -7,7 +7,7 @@ class CleanCssMinifier extends BaseMinifier
         return 'clean-css'
 
 
-    minify: (inputFilename, outputFilename, options, callback) ->
+    minify: (inputFilename, outputFilename, callback) ->
         minified = undefined
         error = undefined
 

@@ -1,26 +1,30 @@
+path = require('path')
+fs = require('fs')
+
+
 module.exports =
 class AtomMinifyInlineParameters
 
     parse: (filename, callback) ->
-        path = require('path')
-
         @readFirstLine filename, (line, error) =>
             if error
                 callback(undefined, error)
             else
                 params = @parseParameters(line)
-                if params.main
-                    parentFilename = path.resolve(path.dirname(filename), params.main)
-                    @parse(parentFilename, callback)
+                if typeof params is 'object'
+                    if typeof params.main is 'string'
+                        parentFilename = path.resolve(path.dirname(filename), params.main)
+                        callback(parentFilename)
+                    else
+                        params.inputFilename = filename
+                        callback(params)
                 else
-                    callback(params)
+                    callback(false)
 
 
     readFirstLine: (filename, callback) ->
-        fs = require('fs')
-
         if !fs.existsSync(filename)
-            callback(null, "Invalid file: #{filename}")
+            callback(null, "File does not exist: #{filename}")
             return
 
         # createReadStreams reads 65KB blocks and for each block data event is triggered,
@@ -47,8 +51,6 @@ class AtomMinifyInlineParameters
 
 
     parseParameters: (str) ->
-        params = []
-
         # Extract comment block, if comment is put into /* ... */
         if (match = /^\s*\/\*\s*(.*?)\s*\*\//m.exec(str)) != null
             str = match[1]
@@ -63,7 +65,8 @@ class AtomMinifyInlineParameters
             return false
 
         # Extract keys and values
-        regex = /(?:\s*([\w]+)(?:\:\s*((?:["'](?:.*?)["'])|[^,;]+))?\s*)*/g
+        regex = /(?:\s*([\w-]+)(?:[ ]*\:\s*((?:["'](?:.*?)["'])|[^,;]+))?\s*)*/g
+        params = []
         while (match = regex.exec(str)) != null
             if match.index == regex.lastIndex
                 regex.lastIndex++

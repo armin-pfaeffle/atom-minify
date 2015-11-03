@@ -1,3 +1,5 @@
+{CompositeDisposable} = require('atom')
+
 AtomMinifyOptions = require('./options')
 AtomMinifyView = require('./atom-minify-view')
 AtomMinifier = require('./minifier')
@@ -188,15 +190,46 @@ module.exports =
             order: 84
 
 
+        # Advanced options
+
+        absoluteJavaPath:
+            title: 'Advanced → Java path'
+            description: 'Please only use if you need this option! You can enter an absolute path to your Java executable. Useful when you have more than one Java installation'
+            type: 'string'
+            default: ''
+            order: 100
+
+
     atomMinifyView: null
     mainSubmenu: null
     contextMenuItem: null
 
 
     activate: (state) ->
-        @atomMinifyView = new AtomMinifyView(new AtomMinifyOptions(), state.atomMinifyViewState)
+        @subscriptions = new CompositeDisposable
+        @editorSubscriptions = new CompositeDisposable
 
-        atom.commands.add 'atom-workspace',
+        @atomMinifyView = new AtomMinifyView(new AtomMinifyOptions(), state.atomMinifyViewState)
+        @isProcessing = false
+
+        @registerCommands()
+        @registerTextEditorSaveCallback()
+        @registerConfigObserver()
+        @registerContextMenuItem()
+
+
+    deactivate: ->
+        @subscriptions.dispose()
+        @editorSubscriptions.dispose()
+        @atomMinifyView.destroy()
+
+
+    serialize: ->
+        atomMinifyViewState: @atomMinifyView.serialize()
+
+
+    registerCommands: ->
+        @subscriptions.add atom.commands.add 'atom-workspace',
             'atom-minify:toggle-minify-on-save': =>
                 @toggleMinifyOnSave()
 
@@ -231,17 +264,46 @@ module.exports =
             'atom-minify:js-minifier-uglifyjs2': =>
                 @selectJsMinifier('UglifyJS2')
 
-        @registerTextEditorSaveCallback()
-        @registerConfigObserver()
-        @registerContextMenuItem()
+
+    registerTextEditorSaveCallback: ->
+        @editorSubscriptions.add atom.workspace.observeTextEditors (editor) =>
+            @subscriptions.add editor.onDidSave =>
+                if AtomMinifyOptions.get('minifyOnSave') and !@isProcessing
+                    @minify(AtomMinifier.MINIFY_TO_MIN_FILE, true)
 
 
-    deactivate: ->
-        @atomMinifyView.destroy()
+    registerConfigObserver: ->
+        @subscriptions.add atom.config.observe AtomMinifyOptions.OPTIONS_PREFIX + 'cssMinifier', (newValue) =>
+            @updateMenuItems()
+        @subscriptions.add atom.config.observe AtomMinifyOptions.OPTIONS_PREFIX + 'jsMinifier', (newValue) =>
+            @updateMenuItems()
+        @subscriptions.add atom.config.observe AtomMinifyOptions.OPTIONS_PREFIX + 'minifyOnSave', (newValue) =>
+            @updateMenuItems()
 
 
-    serialize: ->
-        atomMinifyViewState: @atomMinifyView.serialize()
+    registerContextMenuItem: ->
+        menuItem = @getContextMenuItem()
+        menuItem.shouldDisplay = (evt) ->
+            showItemOption = AtomMinifyOptions.get('showMinifyItemInTreeViewContextMenu')
+            if showItemOption in ['Only on CSS and JS files', 'On every file']
+                target = evt.target
+                if target.nodeName.toLowerCase() is 'span'
+                    target = target.parentNode
+
+                isFileItem = target.getAttribute('class').split(' ').indexOf('file') >= 0
+                if isFileItem
+                    if showItemOption is 'On every file'
+                        return true
+                    else
+                        path = require('path')
+
+                        child = target.firstElementChild
+                        basename = path.basename(child.getAttribute('data-name'))
+                        fileExtension = path.extname(basename).replace('.', '').toLowerCase()
+
+                        return fileExtension in ['css', 'js']
+
+            return false
 
 
     toggleMinifyOnSave: ->
@@ -269,93 +331,78 @@ module.exports =
         @updateMenuItems()
 
 
-    registerTextEditorSaveCallback: ->
-        @isProcessing = false
-        atom.workspace.observeTextEditors (editor) =>
-            editor.onDidSave =>
-                if AtomMinifyOptions.get('minifyOnSave') and !@isProcessing
-                    @minify(AtomMinifier.MINIFY_TO_MIN_FILE, true)
-
-
-    registerConfigObserver: ->
-        atom.config.observe AtomMinifyOptions.OPTIONS_PREFIX + 'cssMinifier', (newValue) =>
-            @updateMenuItems()
-        atom.config.observe AtomMinifyOptions.OPTIONS_PREFIX + 'jsMinifier', (newValue) =>
-            @updateMenuItems()
-        atom.config.observe AtomMinifyOptions.OPTIONS_PREFIX + 'minifyOnSave', (newValue) =>
-            @updateMenuItems()
-
-
-    registerContextMenuItem: ->
-        menuItem = @getContextMenuItem()
-        menuItem.shouldDisplay = (evt) ->
-            showItemOption = AtomMinifyOptions.get('showMinifyItemInTreeViewContextMenu')
-            if showItemOption in ['Only on CSS and JS files', 'On every file']
-                isFileItem = evt.target.getAttribute('class').split(' ').indexOf('file') >= 0
-                if isFileItem
-                    if showItemOption is 'On every file'
-                        return true
-                    else
-                        path = require('path')
-
-                        child = evt.target.firstElementChild
-                        basename = path.basename(child.getAttribute('data-name'))
-                        fileExtension = path.extname(basename).replace('.', '').toLowerCase()
-
-                        return fileExtension in ['css', 'js']
-
-            return false
-
-
     minifyToFile: (evt) ->
         # Detect if it's a call by Tree View context menu, and if so, extract the file path
         filename = undefined
         if typeof evt is 'object'
-            if evt.target.getAttribute('class').split(' ').indexOf('file') >= 0
-                child = evt.target.firstElementChild
-                tmpFilename = child.getAttribute('data-path')
-                fs = require('fs')
-                if tmpFilename and fs.existsSync(tmpFilename)
-                    filename = tmpFilename
-        @minify(AtomMinifier.MINIFY_TO_MIN_FILE, false, tmpFilename)
+            target = evt.target
+            if target.nodeName.toLowerCase() is 'span'
+                target = target.parentNode
+
+            isFileItem = target.getAttribute('class').split(' ').indexOf('file') >= 0
+            if isFileItem
+                filename = target.firstElementChild.getAttribute('data-path')
+
+        @minify(AtomMinifier.MINIFY_TO_MIN_FILE, false, filename)
 
 
     minify: (mode, minifyOnSave = false, filename = null) ->
+        if @isProcessing
+            return
+
         options = new AtomMinifyOptions()
+        @isProcessing = true
+        @panelIsHiddenAndReset = false
 
         @atomMinifyView.updateOptions(options)
-        @atomMinifyView.hidePanel(false, true)
 
-        minifier = new AtomMinifier(options)
-        minifier.onStart( (args) =>
+        @minifier = new AtomMinifier(options)
+        @minifier.onStart (args) =>
+            if not @panelIsHiddenAndReset
+                @atomMinifyView.hidePanel(false, true)
+                @panelIsHiddenAndReset = true
             @atomMinifyView.startMinification(args)
-        )
-        minifier.onSuccess( (args) =>
+
+        @minifier.onWarning (args) =>
+            @atomMinifyView.warning(args)
+
+        @minifier.onSuccess (args) =>
             @atomMinifyView.successfullMinification(args)
-            @isProcessing = false
-        )
-        minifier.onError( (args) =>
+
+        @minifier.onError (args) =>
+            if not @panelIsHiddenAndReset
+                @atomMinifyView.hidePanel(false, true)
+                @panelIsHiddenAndReset = true
             @atomMinifyView.erroneousMinification(args)
-            isProcessing = false
-        )
-        minifier.minify(mode, minifyOnSave, filename)
+
+        @minifier.onFinished (args) =>
+            @atomMinifyView.finished(args)
+            @isProcessing = false
+            @minifier.destroy()
+            @minifier = null
+
+        @minifier.minify(mode, minifyOnSave, filename)
 
 
     updateMenuItems: ->
-        menu = @getMainMenuSubmenu()
-        menu.submenu[2].label = (if AtomMinifyOptions.get('minifyOnSave') then 'Disable' else 'Enable') + ' minification on save'
+        menu = @getMainMenuSubmenu().submenu
+        return unless menu
 
-        # Update checked minifier item
-        for submenu in menu.submenu
-            switch submenu.label
-                when 'CSS minifier' then type = 'css'
-                when 'JS minifier' then type = 'js'
-                else type = false
-            if type
-                minifierSelector = type + 'Minifier'
-                minifierName = AtomMinifyOptions.get(minifierSelector)
-                for minifierItem in submenu.submenu
-                    minifierItem.checked = minifierItem.label is minifierName
+        menu[3].label = (if AtomMinifyOptions.get('minifyOnSave') then '✔' else '✕') + '  Minification on save'
+
+        cssMinifiers = menu[5].submenu
+        if cssMinifiers
+            cssMinifiers[0].checked = AtomMinifyOptions.get('cssMinifier') is 'YUI Compressor'
+            cssMinifiers[1].checked = AtomMinifyOptions.get('cssMinifier') is 'clean-css'
+            cssMinifiers[2].checked = AtomMinifyOptions.get('cssMinifier') is 'CSSO'
+            cssMinifiers[3].checked = AtomMinifyOptions.get('cssMinifier') is 'Sqwish'
+
+        jsMinifiers = menu[6].submenu
+        if jsMinifiers
+            jsMinifiers[0].checked = AtomMinifyOptions.get('jsMinifier') is 'YUI Compressor'
+            jsMinifiers[1].checked = AtomMinifyOptions.get('jsMinifier') is 'Google Closure Compiler'
+            jsMinifiers[2].checked = AtomMinifyOptions.get('jsMinifier') is 'UglifyJS2'
+
         atom.menu.update()
 
 
@@ -379,9 +426,9 @@ module.exports =
             found = false
             for items in atom.contextMenu.itemSets
                 if items.selector is '.tree-view'
-                    found = true
                     for item in items.items
                         if item.id is 'atom-minify-context-menu-minify'
+                            found = true
                             @contextMenuItem = item
                             break
 
