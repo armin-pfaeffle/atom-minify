@@ -6,7 +6,7 @@ Minifies JS and CSS files, optionally on save; now supporting inline-parameters.
 
 Because [minifier](https://atom.io/packages/minifier) is no longer maintained, I created [atom-minify](https://atom.io/packages/atom-minify) which includes **four CSS and three JS minifiers**. Another feature is the flexible configuration which should give you full control over minification and created files. Inline-parameters complete the way of defining the output.
 
-*In current version minifier options are ignored at the moment. This feature will be included in next version.*
+*Since version 0.6.0. minifier options are supported!*
 
 Have a look at the [roadmap](#roadmap) for upcoming features.
 
@@ -83,19 +83,19 @@ Defines which CSS minifier you want to use. Current options: [YUI Compressor](ht
 Defines the replacement pattern for minified CSS filename. You can use two placeholders: `$1` for filename without extenion, `$2` for file extension. Example: the default value `$1.min.$2` generates from filename `Foo.CSS` the minified filename `Foo.min.CSS`.  
 *__Default__: $1.min.$2*
 
-- #### CSS → Parameters for YUI Compressor
-Additional parameters for CSS minifier **YUI Compressor**, [see node-minify documentation](https://www.npmjs.com/package/node-minify#passing-options) and [YUI Compressor documentation](http://developer.yahoo.com/yui/compressor/).  
+- #### CSS → Options for YUI Compressor
+Custom options for CSS minifier **YUI Compressor**, [see OPTIONS.md](https://github.com/armin-pfaeffle/atom-minify/blob/master/OPTIONS.md).  
 *__Default__: ''*
 
-- #### CSS → Parameters for clean-css
-Additional parameters for CSS minifier **clean-css**, [see node-minify documentation](https://www.npmjs.com/package/node-minify#passing-options) and [clean-css documentation](https://github.com/GoalSmashers/clean-css).  
+- #### CSS → Options for clean-css
+Custom options for CSS minifier **clean-css**, [see OPTIONS.md](https://github.com/armin-pfaeffle/atom-minify/blob/master/OPTIONS.md).  
 
-- #### CSS → Parameters for CSSO
-Additional parameters for CSS minifier **CSSO**, [see node-minify documentation](https://www.npmjs.com/package/node-minify#passing-options) and [CSSO documentation](https://github.com/css/csso).  
+- #### CSS → Options for CSSO
+Custom parameters for CSS minifier **CSSO**, [see OPTIONS.md](https://github.com/armin-pfaeffle/atom-minify/blob/master/OPTIONS.md).  
 *__Default__: ''*
 
-- #### CSS → Parameters for Sqwish
-Additional parameters for CSS minifier **Sqwish**, [see node-minify documentation](https://www.npmjs.com/package/node-minify#passing-options) and [Sqwish documentation](https://github.com/ded/sqwish).  
+- #### CSS → Options for Sqwish
+Custom options for CSS minifier **Sqwish**, [see OPTIONS.md](https://github.com/armin-pfaeffle/atom-minify/blob/master/OPTIONS.md).  
 *__Default__: ''*
 
 - #### JS → Minifier
@@ -107,16 +107,16 @@ Defines which JS minifier you want to use. Current options: [YUI Compressor](htt
 Defines the replacement pattern for minified JS filename. You can use two placeholders: `$1` for filename without extenion, `$2` for file extension. Example: the default value `$1.min.$2` generates from filename `Bar.JS` the minified filename `Bar.min.JS`.  
 *__Default__: $1.min.$2*
 
-- #### JS → Parameters for YUI Compressor
-Additional parameters for CSS minifier **YUI Compressor**, [see node-minify documentation](https://www.npmjs.com/package/node-minify#passing-options) and [YUI Compressor documentation](http://developer.yahoo.com/yui/compressor/).  
+- #### JS → Options for YUI Compressor
+Custom options for CSS minifier **YUI Compressor**, [see OPTIONS.md](https://github.com/armin-pfaeffle/atom-minify/blob/master/OPTIONS.md).  
 *__Default__: ''*
 
-- #### JS → Parameters for Google Closure Compiler
-Additional parameters for CSS minifier **Google Closure Compiler**, [see node-minify documentation](https://www.npmjs.com/package/node-minify#passing-options) and [Google Closure Compiler documentation](https://developers.google.com/closure/compiler/).  
+- #### JS → Options for Google Closure Compiler
+Custom options for CSS minifier **Google Closure Compiler**, [see OPTIONS.md](https://github.com/armin-pfaeffle/atom-minify/blob/master/OPTIONS.md).  
 *__Default__: ''*
 
-- #### JS → Parameters for UglifyJS2
-Additional parameters for CSS minifier **UglifyJS2**, [see node-minify documentation](https://www.npmjs.com/package/node-minify#passing-options) and [UglifyJS2 documentation](https://github.com/mishoo/UglifyJS2).  
+- #### JS → Options for UglifyJS2
+Custom options for CSS minifier **UglifyJS2**, [see OPTIONS.md](https://github.com/armin-pfaeffle/atom-minify/blob/master/OPTIONS.md).  
 *__Default__: ''*
 
 - #### Notifications
@@ -171,7 +171,7 @@ h1 {
 }
 ```
 ```css
-/* outputPath: dev, uncompressed */
+/* outputPath: dev, uncompressed, minifierOptions: "line-break = 100" */
 /* This definition put the outputs file to 'dev' subdirectory. Beside that
    the content is not minified, which can be useful for development */
 body {
@@ -182,7 +182,7 @@ h1 {
 
 Example for JS files:
 ```js
-// minifier: uglify-js, buffer: 8388608, minifierOptions:TODO
+// minifier: uglify-js, buffer: 8388608, minifierOptions: "charset = utf-8 nomunge"
 /* This parameters ensures, that YUI compressor is used for this file.
    Furhtermore it tells the minifier to use up to 8MB buffer, which can be
    useful for large files.
@@ -220,7 +220,7 @@ Defines a relative or absolute path where minified file is placed. Can be combin
 
 
 - #### minifierOptions
-*Not supported yet. Coming soon...*
+See [OPTIONS.md](https://github.com/armin-pfaeffle/atom-minify/blob/master/OPTIONS.md) for more information about custom minifier options.
 
 - #### buffer
 This value sets the buffer size in Bytes. It must be a value Integer and **greater than 1024 * 1024 = 1MB**.
@@ -230,7 +230,7 @@ This value sets the buffer size in Bytes. It must be a value Integer and **great
 ## Predefined shortcuts
 
 - #### `ctrl-shift-m`
-Minify content of opened file to **a new file**. The filename of the new file is specified by **Filename pattern for minified CSS/JS file** options. Minification only works on files that ends with `.css` or `.js` (comparison is case **in**sensitive).
+Minify content of opened file to **a new file**. The filename of the new file is specified by **Filename pattern for minified CSS/JS file** options. Minification only works on files that ends with `.css` or `.js` (comparison is case **insensitive**).
 
 - #### `alt-shift-m` / `cmd-shift-m`
 Minify content of opened file. This command does not create a new file, nor saves the minified content. If file extension is `.css` or `.js` the minifier is automatically detected, else you are asked which minifier to use. This option is especially useful when you want to quickly minify CSS or JavaScript without creating a file.
@@ -275,10 +275,18 @@ For other concerns like questions or feeback [have a look at the discussion thre
 - Minify content to a new, unsaved file, so user can decide where to save the new file
 - Minify HTML/JSON/XML/etc.?
 - Compress more than one file to a minified file
-- New option: Overwrite existent file
 
 
 ## Changelog
+
+**0.6.0 - 04.11.2015**
+- Added new feature: options for minifiers
+- Improved panel notifications
+- Improved inline parameter parsing
+- Improved shortcuts
+- Updated Google Closure Compiler
+- Bugfix: Quoted parameters could lead to incorrect behaviour
+- Bugfix: Warning of too less buffer size was never visible to user
 
 **0.5.0 - 27.10.2015**
 - Optimized parameter parsing

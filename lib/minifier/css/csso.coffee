@@ -18,8 +18,8 @@ class CssoMinifier extends BaseMinifier
         css = fs.readFileSync(inputFilename).toString()
 
         try
-            # TODO Use csso.justDoIt(css, true) to turn structure minimization off.
-            minified = csso.justDoIt(css)
+            structureMinimizationOff  = @options.minifierOptions.restructureOff
+            minified = csso.justDoIt(css, structureMinimizationOff)
         catch e
             error = e.message
 

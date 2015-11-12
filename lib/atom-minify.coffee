@@ -82,29 +82,25 @@ module.exports =
             order: 41
 
         cssParametersForYUI:
-            title: 'CSS → Parameters for YUI Compressor'
-            description: 'Additional parameters for CSS minifier \'YUI Compressor\'.'
+            title: 'CSS → Options for YUI Compressor'
             type: 'string'
             default: ''
             order: 42
 
         cssParametersForCleanCSS:
-            title: 'CSS → Parameters for clean-css'
-            description: 'Additional parameters for CSS minifier \'clean-css\'.'
+            title: 'CSS → Options for clean-css'
             type: 'string'
             default: ''
             order: 43
 
         cssParametersForCSSO:
-            title: 'CSS → Parameters for CSSO'
-            description: 'Additional parameters for CSS minifier \'CSSO\'.'
+            title: 'CSS → Options for CSSO'
             type: 'string'
             default: ''
             order: 44
 
         cssParametersForSqwish:
-            title: 'CSS → Parameters for Sqwish'
-            description: 'Additional parameters for CSS minifier \'Sqwish\'.'
+            title: 'CSS → Options for Sqwish'
             type: 'string'
             default: ''
             order: 45
@@ -128,22 +124,19 @@ module.exports =
             order: 61
 
         jsParametersForYUI:
-            title: 'JS → Parameters for YUI Compressor'
-            description: 'Additional parameters for JS minifier \'YUI Compressor\'.'
+            title: 'JS → Options for YUI Compressor'
             type: 'string'
             default: ''
             order: 62
 
         jsParametersForGCC:
-            title: 'JS → Parameters for Google Closure Compiler'
-            description: 'Additional parameters for JS minifier \'Google Closure Compiler\'.'
+            title: 'JS → Options for Google Closure Compiler'
             type: 'string'
             default: ''
             order: 63
 
         jsParametersForUglifyJS2:
-            title: 'JS → Parameters for UglifyJS2'
-            description: 'Additional parameters for JS minifier \'UglifyJS2\'.'
+            title: 'JS → Options for UglifyJS2'
             type: 'string'
             default: ''
             order: 64

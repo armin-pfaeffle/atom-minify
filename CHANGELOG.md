@@ -1,3 +1,12 @@
+**0.6.0 - 04.11.2015**
+- Added new feature: options for minifiers
+- Improved panel notifications
+- Improved inline parameter parsing
+- Improved shortcuts
+- Updated Google Closure Compiler
+- Bugfix: Quoted parameters could lead to incorrect behaviour
+- Bugfix: Warning of too less buffer size was never visible to user
+
 **0.5.0 - 27.10.2015**
 - Optimized parameter parsing
 - Improved shortcuts

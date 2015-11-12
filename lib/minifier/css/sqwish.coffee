@@ -18,9 +18,8 @@ class SqwishMinifier extends BaseMinifier
         css = fs.readFileSync(inputFilename).toString()
 
         try
-            # TODO: Enable strict mode
-            # minified = sqwish.minify(css, true)
-            minified = sqwish.minify(css)
+            strictMode = @options.minifierOptions.strict
+            minified = sqwish.minify(css, strictMode)
         catch e
             error = e.message
 

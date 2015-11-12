@@ -13,6 +13,7 @@
     'ctrl-shift-m': 'atom-minify:minify-to-min-file'
     'cmd-shift-m': 'atom-minify:minify-direct'
 
+'.platform-darwin':
     # Select CSS minifier
     'ctrl-cmd-shift-c ctrl-1': 'atom-minify:css-minifier-yui'
     'ctrl-cmd-shift-c ctrl-2': 'atom-minify:css-minifier-clean-css'
@@ -24,7 +25,6 @@
     'ctrl-cmd-shift-j ctrl-2': 'atom-minify:js-minifier-gcc'
     'ctrl-cmd-shift-j ctrl-3': 'atom-minify:js-minifier-uglifyjs2'
 
-'.platform-darwin':
     'ctrl-cmd-shift-m': 'atom-minify:toggle-minify-on-save'
     'ctrl-cmd-shift-h': 'atom-minify:close-panel'
 
@@ -36,6 +36,7 @@
     'ctrl-alt-shift-m': 'atom-minify:toggle-minify-on-save'
     'ctrl-alt-shift-h': 'atom-minify:close-panel'
 
+'.platform-linux':
     # Select CSS minifier
     'ctrl-alt-shift-c ctrl-1': 'atom-minify:css-minifier-yui'
     'ctrl-alt-shift-c ctrl-2': 'atom-minify:css-minifier-clean-css'
@@ -47,7 +48,6 @@
     'ctrl-alt-shift-j ctrl-2': 'atom-minify:js-minifier-gcc'
     'ctrl-alt-shift-j ctrl-3': 'atom-minify:js-minifier-uglifyjs2'
 
-'.platform-linux':
     'ctrl-alt-shift-m': 'atom-minify:toggle-minify-on-save'
     'ctrl-alt-shift-h': 'atom-minify:close-panel'
 
@@ -57,6 +57,7 @@
     'ctrl-shift-m': 'atom-minify:minify-to-min-file'
     'alt-shift-m': 'atom-minify:minify-direct'
 
+'.platform-win32':
     # Select CSS minifier
     'ctrl-alt-shift-c ctrl-1': 'atom-minify:css-minifier-yui'
     'ctrl-alt-shift-c ctrl-2': 'atom-minify:css-minifier-clean-css'
@@ -68,6 +69,5 @@
     'ctrl-alt-shift-j ctrl-2': 'atom-minify:js-minifier-gcc'
     'ctrl-alt-shift-j ctrl-3': 'atom-minify:js-minifier-uglifyjs2'
 
-'.platform-win32':
     'ctrl-alt-shift-m': 'atom-minify:toggle-minify-on-save'
     'ctrl-alt-shift-h': 'atom-minify:close-panel'

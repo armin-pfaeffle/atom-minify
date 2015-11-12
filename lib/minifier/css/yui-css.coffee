@@ -22,7 +22,14 @@ class YuiCssMinifier extends BaseMinifier
                 exec = require('child_process').exec
 
                 java = if @options.absoluteJavaPath then '"' + @options.absoluteJavaPath + '"' else 'java'
-                command = java + ' -jar -Xss2048k "' + __dirname + '/../_bin/yuicompressor-2.4.7.jar" "' + inputFilename + '" -o "' + outputFilename + '" --type css'
+                command = java + ' -jar -Xss2048k "' + __dirname + '/../_bin/yuicompressor-2.4.7.jar"'
+
+                minifierOptions = @prepareMinifierOptions()
+                command += ' ' + minifierOptions
+
+                command += ' --type css'
+                command += ' -o "' + outputFilename + '"'
+                command += ' "' + inputFilename + '"'
 
                 exec command,
                     maxBuffer: @options.buffer,
@@ -34,3 +41,15 @@ class YuiCssMinifier extends BaseMinifier
                             minified = fs.readFileSync(outputFilename).toString()
 
                         callback(minified, error)
+
+
+    prepareMinifierOptions: () ->
+        options = ''
+
+        if @options.minifierOptions.charset isnt undefined
+            options += ' --charset ' + @options.minifierOptions.charset
+
+        if @options.minifierOptions['line-break'] isnt undefined
+            options += ' --line-break ' + @options.minifierOptions['line-break']
+
+        return options

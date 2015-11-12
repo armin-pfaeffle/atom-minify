@@ -2,6 +2,9 @@
 
 fs = require('fs')
 
+
+# TODO: Use File.fileSizeToReadable before displaying messages with file sizes
+
 module.exports =
 class AtomMinifyView extends View
 
@@ -61,7 +64,7 @@ class AtomMinifyView extends View
                 @showInfoNotification('Start minification', args.inputFilename)
 
         if @options.showPanel
-            @showPanel(true)
+            @showPanel()
             if @options.showStartMinificationNotification
                 if args.isMinifyToFile
                     @addText(args.inputFilename, 'terminal', 'info', (evt) => @openFile(args.inputFilename, evt.target) )
@@ -160,6 +163,7 @@ class AtomMinifyView extends View
                 saving.unit = 'KB'
 
         return saving
+	
 
     finished: (args) ->
         if @hasError
