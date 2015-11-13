@@ -1,3 +1,6 @@
+**0.6.2 - 13.11.2015**
+- Fixed missing dependency in package.json
+
 **0.6.1 - 13.11.2015**
 - Bugfix: Fixed CSP restrictions (EvalError, unsafe-eval) with latest uglify-js version, [issue #17](https://github.com/armin-pfaeffle/atom-minify/issues/17)
 
