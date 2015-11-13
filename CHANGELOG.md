@@ -1,3 +1,6 @@
+**0.6.1 - 13.11.2015**
+- Bugfix: Fixed CSP restrictions (EvalError, unsafe-eval) with latest uglify-js version, [issue #17](https://github.com/armin-pfaeffle/atom-minify/issues/17)
+
 **0.6.0 - 04.11.2015**
 - Added new feature: options for minifiers
 - Improved panel notifications

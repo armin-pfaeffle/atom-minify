@@ -1,4 +1,8 @@
 {BaseMinifier} = require('./../BaseMinifier.coffee')
+{allowUnsafeEval, allowUnsafeNewFunction} = require 'loophole'
+
+fs = require('fs')
+
 
 module.exports =
 class UglifyJsMinifier extends BaseMinifier
@@ -11,11 +15,13 @@ class UglifyJsMinifier extends BaseMinifier
         minified = undefined
         error = undefined
 
-        uglifyJs = require('uglify-js')
-        fs = require('fs')
-
         minifierOptions = @prepareMinifierOptions()
-        result = uglifyJs.minify(inputFilename, minifierOptions)
+
+        result = null
+
+        allowUnsafeNewFunction () =>
+            uglifyJs = require('uglify-js')
+            result = uglifyJs.minify(inputFilename, minifierOptions)
 
         if not result.error
             minified = result.code
