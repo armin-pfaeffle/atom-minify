@@ -183,7 +183,7 @@ Examples for CSS files:
 ```css
 /* minifyOnSave, filenamePattern: test/$1.compressed.$2 */
 OR
-/* filenamePattern: "/this is just a test/project/css/$1.compressed.$2 */
+/* filenamePattern: "/this is just a test/project/css/$1.compressed.$2" */
 body {
 }
 h1 {
