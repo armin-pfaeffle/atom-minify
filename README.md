@@ -1,14 +1,11 @@
 # atom-minify
 
-Minifies JS and CSS files, optionally on save; now supporting inline-parameters.
+Minifies JS and CSS files, optionally on save; now supporting inline-parameters and minifier options.
 
 ---
 
 Because [minifier](https://atom.io/packages/minifier) is no longer maintained, I created [atom-minify](https://atom.io/packages/atom-minify) which includes **four CSS and three JS minifiers**. Another feature is the flexible configuration which should give you full control over minification and created files. Inline-parameters complete the way of defining the output.
 
-*Since version 0.6.0. minifier options are supported!*
-
-Have a look at the [roadmap](#roadmap) for upcoming features.
 
 
 ## Requirements
@@ -19,22 +16,25 @@ When you want to use **YUI Compressor** or **Google Closure Compiler**, you must
 
 ## Usage
 
-#### Basic usage
-After installing [atom-minify](https://atom.io/packages/atom-minify) you can use two shortcuts to access the **two different minification functionalites**:
+#### Minify on save
 
-1. `ctrl-shift-m`: Minify content of opened file to a new file (see [minified filename pattern](#filename-pattern-for-minified-css-file)). If file already exists, content is overwritten.
-2. `alt-shift-m` / `cmd-shift-m`: Direct minification of content. Does not create a new file, nor save the modification. If you have an unsaved file, you also can minify content, but you are asked which content type (CSS or JS) it is.
+Beside shortcuts and access via menu, which is described above, you can enable option [Minify on save](#minify-on-save) (shortcut: `ctrl-alt-shift-m` / `ctrl-cmd-shift-m`), so everytime you save a CSS or JavaScript file, it is minified **to a new minified file**. The filename can be configured by a filename pattern (by options [1](#css--filename-pattern-for-minified-file) / [2](#js--filename-pattern-for-minified-file) or by [inline parameter](#filenamepattern)).
+
+Alternatively you can use [minifyOnSave](#minifyOnSave) parameter to control this behaviour.
+
+#### Usage by shortcut or menu
+You can use two shortcuts to access the **two different minification functionalites**:
+
+1. `ctrl-shift-m`: **Minify an existant and opened file to a new file** (see options [1](#css--filename-pattern-for-minified-file) / [2](#js--filename-pattern-for-minified-file) or by [inline parameter](#filenamepattern)). If file already exists, content is overwritten.
+
+2. `alt-shift-m` / `cmd-shift-m`: **Direct minification of content** which means that visible CSS or JavaScript text is replaced by its minified version. So you can open a new tab, paste your code and minify it without saving any file.
 
 Beside the shortcuts you also have the possibility to access these actions by menu:
 - `Package` → `Minify` → `Minify to minified file`
 - `Package` → `Minify` → `Direct Minification`.
 
-#### Minify on save
-
-Beside the shortcuts and menu items, you can enable option [Minify on save](#minify-on-save) (shortcut: `ctrl-alt-shift-m`/ `ctrl-cmd-shift-m`), so everytime you save a CSS or JavaScript file, it is directly minified to a new minified file.
-
 #### 4+3 minifiers
-Because `node-minify` supports **four CSS and three JS minifiers** you can select which one to use. Especially when you don't want to install Java on your system, these feature is great for you. There even exists [predefined shortcuts](#predefined-shortcuts) for instant changing the minifier.
+With this package you can select between **four CSS and three JS minifiers**. Especially when you don't want to install Java on your system, these feature is great for you. There even exists [predefined shortcuts](#predefined-shortcuts) for instant changing the minifier.
 
 #### Options & parameters
 Beside the basic functionality, have a look at the [options](#options). You can configure a lot of things ;)
@@ -46,104 +46,124 @@ Since version 0.3 you have the possibility to use [inline-parameters](#inline-pa
 ## Options
 
 - #### Minify on save
-This option en-/disables minification on save. This is especially useful when you want to create minified files everytime you save a CSS or JavaScript file.  
-**Shortcut for en-/disable this option**: `ctrl-alt-shift-m` / `ctrl-cmd-shift-m`  
-*__Default__: false*
+    This option en-/disables minification on save. This is especially useful when you want to create minified files everytime you save a CSS or JavaScript file.  
+    **Shortcut for en-/disable this option**: `ctrl-alt-shift-m` / `ctrl-cmd-shift-m`  
+    *__Default__: false*
 
 - #### Show saving info
-If enabled some information about saving are shown in notification or panel.  
-*__Default__: true*
+    If enabled some information about saving are shown in notification or panel.  
+    *__Default__: true*
 
 - #### Ask for overwriting already existent minified files
-If enabled atom-minify asks you if you want to overwrite the target output file if it already exists.  
-*__Default__: false*
+    If enabled atom-minify asks you if you want to overwrite the target output file if it already exists.  
+    *__Default__: false*
 
 - #### Ask for minification of already minified files
-If enabled current filename is checked for containing `.min.`, `.minified.` and `.compressed.`. If so, atom-minify assumes that content is already minified and asks you if you want to minify the file again.  
-*__Default__: true*
+    If enabled current filename is checked for containing `.min.`, `.minified.` and `.compressed.`. If so, atom-minify assumes that content is already minified and asks you if you want to minify the file again.  
+    *__Default__: true*
 
 - #### Show Minify-item in Tree View context menu
-If enabled you can minify a file via Tree View context menu. You can choose between showing the item on every file or only on CSS and JavaScript files.
-*__Default__: Only on CSS and JS files*
+    If enabled you can minify a file via Tree View context menu. You can choose between showing the item on every file or only on CSS and JavaScript files.  
+    *__Default__: Only on CSS and JS files*
 
-- #### General output path
-Defines a general output path for minified files, e.g. `min/dev/` or `compressed`. You can use an absolute or relative path. Have a look at the inline parameter `outputPath` which should be more suitable in most cases.  
-*__Default__: ''*
+- #### ~~General output path~~
+    ~~Defines a general output path for minified files, e.g. min/dev/ or compressed. You can use an absolute or relative path. Have a look at the inline parameter outputPath which should be more suitable in most cases.~~
+
+    *Removed since version 0.7.0. Please use filename patterns for defining relative or absolute output paths with filename.*
 
 - #### Buffer
-Only modify the buffer size when you have to compile large files, [see node-minify documentation](https://www.npmjs.com/package/node-minify#max-buffer-size).  
-*__Default__: 1000 * 1024*
+    Only modify the buffer size when you have to compile large files, [see node-minify documentation](https://www.npmjs.com/package/node-minify#max-buffer-size).  
+    *__Default__: 1000 \* 1024*
 
 - #### CSS → Minifier
-Defines which CSS minifier you want to use. Current options: [YUI Compressor](http://developer.yahoo.com/yui/compressor/), [clean-css](https://github.com/GoalSmashers/clean-css), [CSSO](https://github.com/css/csso), [Sqwish](https://github.com/ded/sqwish).  
-**See [Predefined shortcuts](#predefined-shortcuts) for changing minifier via shortcut**  
-*__Default__: YUI Compressor*
+    Defines which CSS minifier you want to use. Current options: [YUI Compressor](http://developer.yahoo.com/yui/compressor/), [clean-css](https://github.com/GoalSmashers/clean-css), [CSSO](https://github.com/css/csso), [Sqwish](https://github.com/ded/sqwish).  
+    **See [Predefined shortcuts](#predefined-shortcuts) for changing minifier via shortcut**  
+    *__Default__: YUI Compressor*
 
 - #### CSS → Filename pattern for minified file
-Defines the replacement pattern for minified CSS filename. You can use two placeholders: `$1` for filename without extenion, `$2` for file extension. Example: the default value `$1.min.$2` generates from filename `Foo.CSS` the minified filename `Foo.min.CSS`.  
-*__Default__: $1.min.$2*
+    Defines the replacement pattern for minified CSS filename. You can use two placeholders: `$1` for filename without extenion, `$2` for file extension. Example: the default value `$1.min.$2` generates from filename `Foo.CSS` the minified filename `Foo.min.CSS`.  
+    *__Default__: $1.min.$2*
+
+    Example:
+    ```
+    Relative path:
+    ../css/min/$1.min.$2
+
+    Absolute path:
+    /path/to/your/project/css/$1.min.$2
+    ```
 
 - #### CSS → Options for YUI Compressor
-Custom options for CSS minifier **YUI Compressor**, [see OPTIONS.md](https://github.com/armin-pfaeffle/atom-minify/blob/master/OPTIONS.md).  
-*__Default__: ''*
+    Custom options for CSS minifier **YUI Compressor**, [see OPTIONS.md](https://github.com/armin-pfaeffle/atom-minify/blob/master/OPTIONS.md).  
+    *__Default__: ''*
 
 - #### CSS → Options for clean-css
-Custom options for CSS minifier **clean-css**, [see OPTIONS.md](https://github.com/armin-pfaeffle/atom-minify/blob/master/OPTIONS.md).  
+    Custom options for CSS minifier **clean-css**, [see OPTIONS.md](https://github.com/armin-pfaeffle/atom-minify/blob/master/OPTIONS.md).  
+    *__Default__: ''*
 
 - #### CSS → Options for CSSO
-Custom parameters for CSS minifier **CSSO**, [see OPTIONS.md](https://github.com/armin-pfaeffle/atom-minify/blob/master/OPTIONS.md).  
-*__Default__: ''*
+    Custom parameters for CSS minifier **CSSO**, [see OPTIONS.md](https://github.com/armin-pfaeffle/atom-minify/blob/master/OPTIONS.md).  
+    *__Default__: ''*
 
 - #### CSS → Options for Sqwish
-Custom options for CSS minifier **Sqwish**, [see OPTIONS.md](https://github.com/armin-pfaeffle/atom-minify/blob/master/OPTIONS.md).  
-*__Default__: ''*
+    Custom options for CSS minifier **Sqwish**, [see OPTIONS.md](https://github.com/armin-pfaeffle/atom-minify/blob/master/OPTIONS.md).  
+    *__Default__: ''*
 
 - #### JS → Minifier
-Defines which JS minifier you want to use. Current options: [YUI Compressor](http://developer.yahoo.com/yui/compressor/), [Google Closure Compiler](https://developers.google.com/closure/compiler/), [UglifyJS2](https://github.com/mishoo/UglifyJS2).  
-**See [Predefined shortcuts](#predefined-shortcuts) for changing minifier via shortcut**  
-*__Default__: YUI Compressor*
+    Defines which JS minifier you want to use. Current options: [YUI Compressor](http://developer.yahoo.com/yui/compressor/), [Google Closure Compiler](https://developers.google.com/closure/compiler/), [UglifyJS2](https://github.com/mishoo/UglifyJS2).  
+    **See [Predefined shortcuts](#predefined-shortcuts) for changing minifier via shortcut**  
+    *__Default__: YUI Compressor*
 
 - #### JS → Filename pattern for minified file
-Defines the replacement pattern for minified JS filename. You can use two placeholders: `$1` for filename without extenion, `$2` for file extension. Example: the default value `$1.min.$2` generates from filename `Bar.JS` the minified filename `Bar.min.JS`.  
-*__Default__: $1.min.$2*
+    Defines the replacement pattern for minified JS filename. You can use two placeholders: `$1` for filename without extenion, `$2` for file extension. Example: the default value `$1.min.$2` generates from filename `Bar.JS` the minified filename `Bar.min.JS`.  
+    *__Default__: $1.min.$2*
+
+    Example:
+    ```
+    Relative path:
+    ../css/min/$1.min.$2
+
+    Absolute path:
+    /path/to/your/project/css/$1.min.$2
+    ```
 
 - #### JS → Options for YUI Compressor
-Custom options for CSS minifier **YUI Compressor**, [see OPTIONS.md](https://github.com/armin-pfaeffle/atom-minify/blob/master/OPTIONS.md).  
-*__Default__: ''*
+    Custom options for CSS minifier **YUI Compressor**, [see OPTIONS.md](https://github.com/armin-pfaeffle/atom-minify/blob/master/OPTIONS.md).  
+    *__Default__: ''*
 
 - #### JS → Options for Google Closure Compiler
-Custom options for CSS minifier **Google Closure Compiler**, [see OPTIONS.md](https://github.com/armin-pfaeffle/atom-minify/blob/master/OPTIONS.md).  
-*__Default__: ''*
+    Custom options for CSS minifier **Google Closure Compiler**, [see OPTIONS.md](https://github.com/armin-pfaeffle/atom-minify/blob/master/OPTIONS.md).  
+    *__Default__: ''*
 
 - #### JS → Options for UglifyJS2
-Custom options for CSS minifier **UglifyJS2**, [see OPTIONS.md](https://github.com/armin-pfaeffle/atom-minify/blob/master/OPTIONS.md).  
-*__Default__: ''*
+    Custom options for CSS minifier **UglifyJS2**, [see OPTIONS.md](https://github.com/armin-pfaeffle/atom-minify/blob/master/OPTIONS.md).  
+    *__Default__: ''*
 
 - #### Notifications
-This options allows you to decide which feedback you want to see when SASS files are compiled: notification and/or panel.  
-**Panel**: The panel is shown at the bottom of the editor. When starting the compilation it's only a small header with a throbber. After compiliation a success or error message is shown with reference to the CSS file, or on error the SCSS file. By clicking on the message you can access the CSS or error file.  
-**Notification**: The default atom notifications are used for output.  
-*__Default__: Panel*
+    This options allows you to decide which feedback you want to see when SASS files are compiled: notification and/or panel.  
+    **Panel**: The panel is shown at the bottom of the editor. When starting the compilation it's only a small header with a throbber. After compiliation a success or error message is shown with reference to the CSS file, or on error the SCSS file. By clicking on the message you can access the CSS or error file.  
+    **Notification**: The default atom notifications are used for output.  
+    *__Default__: Panel*
 
 - #### Automatically hide panel on ...
-Select on which event the panel should automatically disappear. If you want to hide the panel via shortcut, you can use `ctrl-alt-shift-h` / `ctrl-cmd-shift-h`.  
-*__Default__: Success*
+    Select on which event the panel should automatically disappear. If you want to hide the panel via shortcut, you can use `ctrl-alt-shift-h` / `ctrl-cmd-shift-h`.  
+    *__Default__: Success*
 
 - #### Panel-auto-hide delay
-Delay after which panel is automatically hidden.
-*__Default__: 3000*
+    Delay after which panel is automatically hidden.  
+    *__Default__: 3000*
 
 - #### Automatically hide notifications on ...
-Decide when you want the notifications to automatically hide. Else you have to close every notification manually.  
-*__Default__: Info, Success*
+    Decide when you want the notifications to automatically hide. Else you have to close every notification manually.  
+    *__Default__: Info, Success*
 
 - #### Show 'Start Minification' Notification
-If enabled and you added the notification option in `Notifications`, you will see an info-message when minification process starts.  
-*__Default__: false*
+    If enabled and you added the notification option in `Notifications`, you will see an info-message when minification process starts.  
+    *__Default__: false*
 
 - #### Advanced → Java path
-If you have more than one Java installation or you have a special constellation, you can use this option to define a path to a Java executable. This executable is used for YUI and GCC minifiers.  
-*__Default__: ''*
+    If you have more than one Java installation or you have a special constellation, you can use this option to define a path to a Java executable. This executable is used for YUI and GCC minifiers.  
+    *__Default__: ''*
 
 
 ## Inline-parameters
@@ -161,19 +181,16 @@ You can add them by writing a comment to the first line of your CSS or JS file. 
 
 Examples for CSS files:
 ```css
-/* filenamePattern: test/$1.compressed.$2, outputPath: "compressed/dev, tested/" */
-/* This definition redefines the filename pattern and additionally adds the
-   subdirectory 'test'. Furthermore an output path is defined, so the resultant
-   path is 'compressed/dev/test/<filename>'. Have a look at the usage of the comma! */
+/* minifyOnSave, filenamePattern: test/$1.compressed.$2 */
+OR
+/* filenamePattern: "/this is just a test/project/css/$1.compressed.$2 */
 body {
 }
 h1 {
 }
 ```
 ```css
-/* outputPath: dev, uncompressed, minifierOptions: "line-break = 100" */
-/* This definition put the outputs file to 'dev' subdirectory. Beside that
-   the content is not minified, which can be useful for development */
+/* minifierOptions: "line-break = 100" */
 body {
 }
 h1 {
@@ -182,12 +199,7 @@ h1 {
 
 Example for JS files:
 ```js
-// minifier: uglify-js, buffer: 8388608, minifierOptions: "charset = utf-8 nomunge"
-/* This parameters ensures, that YUI compressor is used for this file.
-   Furhtermore it tells the minifier to use up to 8MB buffer, which can be
-   useful for large files.
-   As you can see, the minifierOptions parameter is still under
-   construction ;) */
+// minifier: yui-js, buffer: 8388608, minifierOptions: "charset = utf-8 nomunge"
 function(document, window, undefined) {
     alert('Hello World!')
 }(document, window);
@@ -195,14 +207,35 @@ function(document, window, undefined) {
 
 ### Available parameters
 
-- #### compress: false / uncompressed
-With these parameter you can disable minification, so output is not minified. Can be useful for development process.
+- #### minifyOnSave | minifyOnSave [ : true | false ]
+    With this option you can control minify on save functionality by first line parameter. If you define this option, global option is overwritten. Examples:
+
+    ```
+    Enable minify on save
+    // minifyOnSave
+    // minOnSave: true
+    // minOnSave
+    // minOnSave: true
+
+    Disable minify on save
+    // !minifyOnSave
+    // minifyOnSave: false
+    // !minOnSave
+    // minOnSave: false
+    ```
+
+- #### compress: false | uncompressed
+    With these parameter you can disable minification, so output is not minified. Can be useful for development process.
 
 - #### filenamePattern
-Defines the replacement pattern for minified CSS or JS filename. You can use two placeholders: `$1` for filename without extenion, `$2` for file extension. Example: the default value `$1.min.$2` generates from filename `Foo.CSS` the minified filename `Foo.min.CSS`.
+    Defines the replacement pattern for minified CSS or JS filename. You can use two placeholders: `$1` for filename without extenion, `$2` for file extension. Example: the default value `$1.min.$2` generates from filename `Foo.CSS` the minified filename `Foo.min.CSS`.
 
-- #### outputPath
-Defines a relative or absolute path where minified file is placed. Can be combined with `filenamePattern`.
+    You can add relative or absolute path too, e.g. `filenamePattern: "/path/to/your/project/css/$1.min.$2"`.
+
+- #### ~~outputPath~~
+    ~~Defines a relative or absolute path where minified file is placed. Can be combined with `filenamePattern`.~~
+
+    *Removed since version 0.7.0. Please use filename patterns for defining relative or absolute output paths with filename.*
 
 - #### minifier
   Selects the minifier to compile with.
@@ -218,49 +251,51 @@ Defines a relative or absolute path where minified file is placed. Can be combin
     - `uglify-js`
     - `yui-js`
 
+   Example: `minifier: clean-css`
+
 
 - #### minifierOptions
-See [OPTIONS.md](https://github.com/armin-pfaeffle/atom-minify/blob/master/OPTIONS.md) for more information about custom minifier options.
+    See [OPTIONS.md](https://github.com/armin-pfaeffle/atom-minify/blob/master/OPTIONS.md) for more information about custom minifier options.
 
 - #### buffer
-This value sets the buffer size in Bytes. It must be a value Integer and **greater than 1024 * 1024 = 1MB**.
+    This value sets the buffer size in Bytes. It must be a value Integer and **greater than 1024 * 1024 = 1MB**.
 
 
 
 ## Predefined shortcuts
 
 - #### `ctrl-shift-m`
-Minify content of opened file to **a new file**. The filename of the new file is specified by **Filename pattern for minified CSS/JS file** options. Minification only works on files that ends with `.css` or `.js` (comparison is case **insensitive**).
+    Minify content of **opened file to a new file**. The filename of the new file is specified by **Filename pattern for minified CSS/JS file** options. In general, minification only works on files that ends with `.css` or `.js` (comparison is case **insensitive**), else atom-minify asks you of which file type it is.
 
 - #### `alt-shift-m` / `cmd-shift-m`
-Minify content of opened file. This command does not create a new file, nor saves the minified content. If file extension is `.css` or `.js` the minifier is automatically detected, else you are asked which minifier to use. This option is especially useful when you want to quickly minify CSS or JavaScript without creating a file.
+    Minify content of opened file. This command does not create a new file, nor saves the minified content. If file extension is `.css` or `.js` the minifier is automatically detected, else you are asked which minifier to use. This option is especially useful when you want to quickly minify CSS or JavaScript without creating a file.
 
 - #### `ctrl-alt-shift-m` / `ctrl-cmd-shift-m`
-En- or disables option [Minify on save](#minify-on-save).
+    En- or disables option [Minify on save](#minify-on-save).
 
 - #### `ctrl-alt-shift-h` / `ctrl-cmd-shift-h`
-Closes notification panel if visible.
+    Closes notification panel if visible.
 
 - #### `ctrl-alt-shift-c ctrl-1` / `ctrl-cmd-shift-c ctrl-1`
-Select the CSS minifier **YUI Compressor**.
+    Select the CSS minifier **YUI Compressor**.
 
 - #### `ctrl-alt-shift-c ctrl-2` / `ctrl-cmd-shift-c ctrl-2`
-Select the CSS minifier **clean-css**.
+    Select the CSS minifier **clean-css**.
 
 - #### `ctrl-alt-shift-c ctrl-3` / `ctrl-cmd-shift-c ctrl-3`
-Select the CSS minifier **CSSO**.
+    Select the CSS minifier **CSSO**.
 
 - #### `ctrl-alt-shift-c ctrl-4` / `ctrl-cmd-shift-c ctrl-4`
-Select the CSS minifier **Sqwish**.
+    Select the CSS minifier **Sqwish**.
 
 - #### `ctrl-alt-shift-j ctrl-1` / `ctrl-cmd-shift-j ctrl-1`
-Select the CSS minifier **YUI Compressor**.
+    Select the CSS minifier **YUI Compressor**.
 
 - #### `ctrl-alt-shift-j ctrl-2` / `ctrl-cmd-shift-j ctrl-2`
-Select the CSS minifier **Google Closure Compiler**.
+    Select the CSS minifier **Google Closure Compiler**.
 
 - #### `ctrl-alt-shift-j ctrl-3` / `ctrl-cmd-shift-j ctrl-3`
-Select the CSS minifier **UglifyJS2**.
+    Select the CSS minifier **UglifyJS2**.
 
 
 ## Issues, questions & feedback
@@ -278,6 +313,14 @@ For other concerns like questions or feeback [have a look at the discussion thre
 
 
 ## Changelog
+
+**0.7.0 - 16.12.2015**
+- Added new parameter: minifyOnSave / minOnSave
+- Improved minification workflow
+- Improved performance of parsing first line parameter
+- Removed unnecessary options `outputPath`, use filename pattern options/parameters
+- Bugfix: Internal options representation missed an option
+- Code refactoring & minor improvements
 
 **0.6.2 - 13.11.2015**
 - Fixed missing dependency in package.json

@@ -1,3 +1,11 @@
+**0.7.0 - 16.12.2015**
+- Added new parameter: minifyOnSave / minOnSave
+- Improved minification workflow
+- Improved performance of parsing first line parameter
+- Removed unnecessary options `outputPath`, use filename pattern options/parameters
+- Bugfix: Internal options representation missed an option
+- Code refactoring & minor improvements
+
 **0.6.2 - 13.11.2015**
 - Fixed missing dependency in package.json
 

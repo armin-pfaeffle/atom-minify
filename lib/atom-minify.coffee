@@ -12,7 +12,7 @@ module.exports =
 
         minifyOnSave:
             title: 'Minify on save'
-            description: 'This option en-/disables minification on save.'
+            description: 'This option en-/disables minify on save.'
             type: 'boolean'
             default: false
             order: 1
@@ -49,19 +49,12 @@ module.exports =
 
         # Extended options for all minifier
 
-        outputPath:
-            title: 'General output path'
-            description: 'General output path for every minification. Can be an absolute or relative path. Inline parameters can overwrite this option.'
-            type: 'string'
-            default: ''
-            order: 20
-
         buffer:
             title: 'Buffer'
             description: 'Only modify the buffer size when you have to compile large files.'
             type: 'integer'
             default: 1024 * 1024
-            order: 21
+            order: 20
 
 
         # Parameters for CSS minifiers
@@ -176,8 +169,8 @@ module.exports =
             order: 83
 
         showStartMinificationNotification:
-            title: 'Show \'Start Minification\' Notification'
-            description: 'If enabled a \'Start Minification\' notification is shown.'
+            title: 'Show \'Minification started\' Notification'
+            description: 'If enabled a \'Minification started\' notification is shown.'
             type: 'boolean'
             default: false
             order: 84
@@ -232,9 +225,9 @@ module.exports =
             'atom-minify:minify-direct': =>
                 @minify(AtomMinifier.MINIFY_DIRECT)
 
-            'atom-minify:close-panel': (e) =>
+            'atom-minify:close-panel': (evt) =>
                 @closePanel()
-                e.abortKeyBinding()
+                evt.abortKeyBinding()
 
             'atom-minify:css-minifier-yui': =>
                 @selectCssMinifier('YUI Compressor')
@@ -261,8 +254,8 @@ module.exports =
     registerTextEditorSaveCallback: ->
         @editorSubscriptions.add atom.workspace.observeTextEditors (editor) =>
             @subscriptions.add editor.onDidSave =>
-                if AtomMinifyOptions.get('minifyOnSave') and !@isProcessing
-                    @minify(AtomMinifier.MINIFY_TO_MIN_FILE, true)
+                if !@isProcessing
+                    @minify(AtomMinifier.MINIFY_TO_MIN_FILE, null, true)
 
 
     registerConfigObserver: ->
@@ -302,9 +295,9 @@ module.exports =
     toggleMinifyOnSave: ->
         AtomMinifyOptions.set('minifyOnSave', !AtomMinifyOptions.get('minifyOnSave'))
         if AtomMinifyOptions.get('minifyOnSave')
-            atom.notifications.addInfo('Minify: Enabled minification on save')
+            atom.notifications.addInfo('Minify: Enabled minify on save')
         else
-            atom.notifications.addWarning('Minify: Disabled minification on save')
+            atom.notifications.addWarning('Minify: Disabled minify on save')
         @updateMenuItems()
 
 
@@ -336,10 +329,10 @@ module.exports =
             if isFileItem
                 filename = target.firstElementChild.getAttribute('data-path')
 
-        @minify(AtomMinifier.MINIFY_TO_MIN_FILE, false, filename)
+        @minify(AtomMinifier.MINIFY_TO_MIN_FILE, filename, false)
 
 
-    minify: (mode, minifyOnSave = false, filename = null) ->
+    minify: (mode, filename = null, minifyOnSave = false) ->
         if @isProcessing
             return
 
@@ -374,14 +367,14 @@ module.exports =
             @minifier.destroy()
             @minifier = null
 
-        @minifier.minify(mode, minifyOnSave, filename)
+        @minifier.minify(mode, filename, minifyOnSave)
 
 
     updateMenuItems: ->
         menu = @getMainMenuSubmenu().submenu
         return unless menu
 
-        menu[3].label = (if AtomMinifyOptions.get('minifyOnSave') then '✔' else '✕') + '  Minification on save'
+        menu[3].label = (if AtomMinifyOptions.get('minifyOnSave') then '✔' else '✕') + '  Minify on save'
 
         cssMinifiers = menu[5].submenu
         if cssMinifiers

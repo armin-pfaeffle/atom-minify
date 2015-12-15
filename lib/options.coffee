@@ -22,12 +22,12 @@ class AtomMinifyOptions
 
     initialize: () ->
         # General options
+        @minifyOnSave = AtomMinifyOptions.get('minifyOnSave')
         @showSavingInfo = AtomMinifyOptions.get('showSavingInfo')
         @checkOutputFileAlreadyExists = AtomMinifyOptions.get('checkOutputFileAlreadyExists')
         @checkAlreadyMinifiedFile = AtomMinifyOptions.get('checkAlreadyMinifiedFile')
 
         # Extended options
-        @outputPath = AtomMinifyOptions.get('outputPath')
         @buffer = AtomMinifyOptions.get('buffer')
 
         # CSS options

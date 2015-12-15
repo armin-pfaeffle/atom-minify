@@ -1,9 +1,9 @@
 {$, $$, View} = require('atom-space-pen-views')
 
+File = require('./helper/file')
+
 fs = require('fs')
 
-
-# TODO: Use File.fileSizeToReadable before displaying messages with file sizes
 
 module.exports =
 class AtomMinifyView extends View
@@ -59,9 +59,9 @@ class AtomMinifyView extends View
 
         if @options.showStartMinificationNotification
             if args.isMinifyDirect
-                @showInfoNotification('Start direct minification')
+                @showInfoNotification('Direct minification started')
             else
-                @showInfoNotification('Start minification', args.inputFilename)
+                @showInfoNotification('Minification started', args.inputFilename)
 
         if @options.showPanel
             @showPanel()
@@ -69,7 +69,7 @@ class AtomMinifyView extends View
                 if args.isMinifyToFile
                     @addText(args.inputFilename, 'terminal', 'info', (evt) => @openFile(args.inputFilename, evt.target) )
                 else
-                    @addText('Start direct minification', 'terminal', 'info',)
+                    @addText('Direct minification started', 'terminal', 'info',)
 
 
     warning: (args) ->
@@ -153,17 +153,13 @@ class AtomMinifyView extends View
 
         # If minified to a file we can reduce used space, rounded to two decimals
         if args.isMinifyToFile
-            if (saving.before > 1024 * 1024)
-                saving.before = Math.round(saving.before / 10485.76) / 100
-                saving.after = Math.round(saving.after / 10485.76) / 100
-                saving.unit = 'MB'
-            else if (saving.before > 1024)
-                saving.before = Math.round(saving.before / 10.24) / 100
-                saving.after = Math.round(saving.after / 10.24) / 100
-                saving.unit = 'KB'
+            tmpSaving = File.fileSizeToReadable([saving.before, saving.after])
+            saving.before = tmpSaving.size[0]
+            saving.after = tmpSaving.size[1]
+            saving.unit = tmpSaving.unit
 
         return saving
-	
+
 
     finished: (args) ->
         if @hasError
