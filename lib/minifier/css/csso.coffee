@@ -1,4 +1,6 @@
 {BaseMinifier} = require('./../BaseMinifier.coffee')
+{allowUnsafeEval, allowUnsafeNewFunction} = require 'loophole'
+
 
 module.exports =
 class CssoMinifier extends BaseMinifier
@@ -19,7 +21,8 @@ class CssoMinifier extends BaseMinifier
 
         try
             structureMinimizationOff  = @options.minifierOptions.restructureOff
-            minified = csso.justDoIt(css, structureMinimizationOff)
+            allowUnsafeNewFunction () =>
+                minified = csso.justDoIt(css, structureMinimizationOff)
         catch e
             error = e.message
 
