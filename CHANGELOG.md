@@ -1,3 +1,6 @@
+**0.7.2 - 26.04.2016**
+- Bugfix: UglifyJS2 option `source_map` does not work ([issue #24](https://github.com/armin-pfaeffle/atom-minify/issues/24))
+
 **0.7.0 - 16.12.2015**
 - Added new parameter: minifyOnSave / minOnSave
 - Improved minification workflow

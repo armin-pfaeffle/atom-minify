@@ -392,7 +392,7 @@ Documentation: https://developers.google.com/closure/compiler/docs/gettingstarte
     Beautify output? Default: false.
 
 * `source_map = <value>`  
-    Output a source map.
+    Output a source map. Enter a filename pattern which will be parsed. You can use two placeholders: `$1` for filename without extension, `$2` for file extension.
 
 * `bracketize = [ true | false ]`  
     Use brackets every time? Default: false.

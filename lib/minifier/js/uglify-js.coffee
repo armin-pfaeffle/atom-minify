@@ -2,6 +2,7 @@
 {allowUnsafeEval, allowUnsafeNewFunction} = require 'loophole'
 
 fs = require('fs')
+path = require('path')
 
 
 module.exports =
@@ -16,16 +17,19 @@ class UglifyJsMinifier extends BaseMinifier
         error = undefined
 
         minifierOptions = @prepareMinifierOptions()
-
         result = null
 
         allowUnsafeNewFunction () =>
             uglifyJs = require('uglify-js')
+            @prepareSourceMap(minifierOptions)
             result = uglifyJs.minify(inputFilename, minifierOptions)
 
         if not result.error
             minified = result.code
             fs.writeFileSync(outputFilename, minified, "utf8")
+
+            if @sourceMap isnt undefined
+                @writeSourceMap(inputFilename, outputFilename)
         else
             error = result.error
 
@@ -84,10 +88,6 @@ class UglifyJsMinifier extends BaseMinifier
         if @options.minifierOptions.beautify isnt undefined
             options.output || options.output = {}
             options.output.beautify = @options.minifierOptions.beautify
-
-        if @options.minifierOptions.source_map isnt undefined
-            options.output || options.output = {}
-            options.output.source_map = @options.minifierOptions.source_map
 
         if @options.minifierOptions.bracketize isnt undefined
             options.output || options.output = {}
@@ -166,3 +166,33 @@ class UglifyJsMinifier extends BaseMinifier
                 options.compress.global_defs = @options.minifierOptions.global_defs
 
         return options
+
+
+    prepareSourceMap: (minifierOptions) ->
+        if @options.minifierOptions.source_map isnt undefined
+            uglifyJs = require('uglify-js')
+            @sourceMap = uglifyJs.SourceMap({ file: @options.minifierOptions.source_map })
+            minifierOptions.output || minifierOptions.output = {}
+            minifierOptions.output.source_map = @sourceMap
+        else
+            @sourceMap = undefined
+
+
+    writeSourceMap: (inputFilename, outputFilename) ->
+        return unless @sourceMap
+        filename = @prepareSourceMapFilename(inputFilename, outputFilename)
+        fs.writeFileSync(filename, @sourceMap.toString(), "utf8")
+
+
+    prepareSourceMapFilename: (inputFilename, outputFilename) ->
+        pattern = @options.minifierOptions.source_map
+        basename = path.basename(inputFilename)
+
+        # we need the file extension without the dot!
+        fileExtension = path.extname(basename).replace('.', '')
+        filename = basename.replace(new RegExp('^(.*?)\.(' + fileExtension + ')$', 'gi'), pattern)
+
+        outputPath = path.dirname(outputFilename)
+        filename = path.join(outputPath, filename)
+
+        return filename
