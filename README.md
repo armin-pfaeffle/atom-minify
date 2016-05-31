@@ -315,4 +315,3 @@ For other concerns like questions or feeback [have a look at the discussion thre
 ## Changelog
 
 See [CHANGELOG.md](CHANGELOG.md).
-

@@ -1,3 +1,9 @@
+**0.7.4 - 31.05.2016**
+- Bugfix: Minification was executed although no editor was active ([issue #25](https://github.com/armin-pfaeffle/atom-minify/issues/25))
+
+**0.7.3 - 26.04.2016**
+- Bugfix: Wrapper CSSO by `allowUnsafeNewFunction` so it works... (CSP restrictions, EvalError, unsafe-eval)
+
 **0.7.2 - 26.04.2016**
 - Bugfix: UglifyJS2 option `source_map` does not work ([issue #24](https://github.com/armin-pfaeffle/atom-minify/issues/24))
 

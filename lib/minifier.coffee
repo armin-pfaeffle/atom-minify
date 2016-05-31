@@ -37,6 +37,10 @@ class AtomMinifier
         @contentType = undefined
         @inputFile = undefined
         @outputFile = undefined
+        
+        if @isMinifyDirect and !atom.workspace.getActiveTextEditor()
+            @emitFinished()
+            return
 
         # Parse inline parameters and run minification; for better performance we use active
         # text-editor if possible, so parameter parser must not load file again
