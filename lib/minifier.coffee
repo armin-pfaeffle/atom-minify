@@ -37,7 +37,7 @@ class AtomMinifier
         @contentType = undefined
         @inputFile = undefined
         @outputFile = undefined
-        
+
         if @isMinifyDirect and !atom.workspace.getActiveTextEditor()
             @emitFinished()
             return
@@ -70,7 +70,7 @@ class AtomMinifier
             # is display and only the finished event is emitted
             if (result = @detectContentType()) in [false, 'cancelled']
                 if result is 'cancelled'
-                    @emitMessageAndFinish('warning', 'Invalid content type. Minification cancelled', true)
+                    @emitMessageAndFinish('warning', 'Invalid content type. Minification cancelled!', true)
                 else
                     @emitFinished()
                 return
@@ -82,7 +82,7 @@ class AtomMinifier
             # minification is available. The reason for this is that building a minified
             # filename is based on the existant filename
             if @isMinifyToFile() and (not @ensureFileIsSaved() or not @checkAlreadyMinifiedFile())
-                @emitMessageAndFinish('warning', 'Minification cancelled')
+                @emitMessageAndFinish('warning', 'Minification cancelled!')
                 return
 
             @updateOptionsByInlineParameters(params)

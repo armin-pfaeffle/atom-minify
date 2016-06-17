@@ -89,9 +89,9 @@ class AtomMinifyView extends View
 
         successMessage = "Successfully minified"
         if @options.showSavingInfo
-            successMessage = "Minification saved #{saving.percentage}% in #{args.statistics.duration}ms"
-            successMessage += "before: #{saving.before} #{saving.unit}"
-            successMessage += "after:  #{saving.after} #{saving.unit}"
+            successMessage = "Minification saved <strong>#{saving.percentage}%</strong> in #{args.statistics.duration}ms"
+            successMessage += " / before: #{saving.before} #{saving.unit}"
+            successMessage += ", after:  #{saving.after} #{saving.unit}"
         if args.isMinifyDirect
             details = "Compressor: #{args.minifierName}"
         else
