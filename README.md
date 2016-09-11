@@ -10,7 +10,7 @@ Because [minifier](https://atom.io/packages/minifier) is no longer maintained, I
 
 ## Requirements
 
-When you want to use **YUI Compressor** or **Google Closure Compiler**, you must install [Java](https://www.java.com/de/download/). If Java is not present, you will see an error message.
+When you want to use **YUI Compressor** or **Google Closure Compiler**, you must install [Java](https://www.java.com/download/). If Java is not present, you will see an error message.
 
 
 
