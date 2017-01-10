@@ -19,7 +19,7 @@ class GccMinifier extends BaseMinifier
                 exec = require('child_process').exec
 
                 java = if @options.absoluteJavaPath then '"' + @options.absoluteJavaPath + '"' else 'java'
-                command = java + ' -server -XX:+TieredCompilation -jar -Xss2048k "' + __dirname + '/../_bin/gcc-20151015.jar"'
+                command = java + ' -server -XX:+TieredCompilation -jar -Xss2048k "' + __dirname + '/../_bin/closure-compiler-v20161201.jar"'
 
                 command += ' --js "' + inputFilename + '"'
                 command += ' --js_output_file "' + outputFilename + '"'

@@ -1,3 +1,7 @@
+**0.8.0 - 10.01.2016**
+- Added new shortcut: Escape closes panel
+- Updated Google Closure Compiler
+
 **0.7.5 - 17.06.2016**
 - Bugfix: Success notification message was not properly formatted ([issue #27](https://github.com/armin-pfaeffle/atom-minify/issues/27))
 

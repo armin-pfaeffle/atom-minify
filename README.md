@@ -273,7 +273,7 @@ function(document, window, undefined) {
 - #### `ctrl-alt-shift-m` / `ctrl-cmd-shift-m`
     En- or disables option [Minify on save](#minify-on-save).
 
-- #### `ctrl-alt-shift-h` / `ctrl-cmd-shift-h`
+- #### `Escape` / `ctrl-alt-shift-h` / `ctrl-cmd-shift-h`
     Closes notification panel if visible.
 
 - #### `ctrl-alt-shift-c ctrl-1` / `ctrl-cmd-shift-c ctrl-1`

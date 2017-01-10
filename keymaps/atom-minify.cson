@@ -27,6 +27,7 @@
 
     'ctrl-cmd-shift-m': 'atom-minify:toggle-minify-on-save'
     'ctrl-cmd-shift-h': 'atom-minify:close-panel'
+    'escape': 'atom-minify:close-panel'
 
 
 # Linux
@@ -50,6 +51,7 @@
 
     'ctrl-alt-shift-m': 'atom-minify:toggle-minify-on-save'
     'ctrl-alt-shift-h': 'atom-minify:close-panel'
+    'escape': 'atom-minify:close-panel'
 
 
 # Windows
@@ -71,3 +73,4 @@
 
     'ctrl-alt-shift-m': 'atom-minify:toggle-minify-on-save'
     'ctrl-alt-shift-h': 'atom-minify:close-panel'
+    'escape': 'atom-minify:close-panel'
